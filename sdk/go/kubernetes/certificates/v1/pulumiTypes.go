@@ -185,11 +185,6 @@ type CertificateSigningRequestCondition struct {
 	// Approved and Denied conditions are mutually exclusive. Approved, Denied, and Failed conditions cannot be removed once added.
 	//
 	// Only one condition of a given type is allowed.
-	//
-	// Possible enum values:
-	//  - `"Approved"` Approved indicates the request was approved and should be issued by the signer.
-	//  - `"Denied"` Denied indicates the request was denied and should not be issued by the signer.
-	//  - `"Failed"` Failed indicates the signer failed to issue the certificate.
 	Type string `pulumi:"type"`
 }
 
@@ -227,11 +222,6 @@ type CertificateSigningRequestConditionArgs struct {
 	// Approved and Denied conditions are mutually exclusive. Approved, Denied, and Failed conditions cannot be removed once added.
 	//
 	// Only one condition of a given type is allowed.
-	//
-	// Possible enum values:
-	//  - `"Approved"` Approved indicates the request was approved and should be issued by the signer.
-	//  - `"Denied"` Denied indicates the request was denied and should not be issued by the signer.
-	//  - `"Failed"` Failed indicates the signer failed to issue the certificate.
 	Type pulumi.StringInput `pulumi:"type"`
 }
 
@@ -323,11 +313,6 @@ func (o CertificateSigningRequestConditionOutput) Status() pulumi.StringOutput {
 // Approved and Denied conditions are mutually exclusive. Approved, Denied, and Failed conditions cannot be removed once added.
 //
 // Only one condition of a given type is allowed.
-//
-// Possible enum values:
-//  - `"Approved"` Approved indicates the request was approved and should be issued by the signer.
-//  - `"Denied"` Denied indicates the request was denied and should not be issued by the signer.
-//  - `"Failed"` Failed indicates the signer failed to issue the certificate.
 func (o CertificateSigningRequestConditionOutput) Type() pulumi.StringOutput {
 	return o.ApplyT(func(v CertificateSigningRequestCondition) string { return v.Type }).(pulumi.StringOutput)
 }

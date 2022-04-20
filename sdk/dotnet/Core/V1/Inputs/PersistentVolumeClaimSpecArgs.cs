@@ -39,7 +39,7 @@ namespace Pulumi.Kubernetes.Types.Inputs.Core.V1
         /// * While DataSource ignores disallowed values (dropping them), DataSourceRef
         ///   preserves all values, and generates an error if a disallowed value is
         ///   specified.
-        /// (Alpha) Using this field requires the AnyVolumeDataSource feature gate to be enabled.
+        /// (Beta) Using this field requires the AnyVolumeDataSource feature gate to be enabled.
         /// </summary>
         [Input("dataSourceRef")]
         public Input<Pulumi.Kubernetes.Types.Inputs.Core.V1.TypedLocalObjectReferenceArgs>? DataSourceRef { get; set; }

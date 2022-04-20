@@ -233,11 +233,6 @@ func (o CronJobListTypeOutput) Metadata() metav1.ListMetaPtrOutput {
 // CronJobSpec describes how the job execution will look like and when it will actually run.
 type CronJobSpec struct {
 	// Specifies how to treat concurrent executions of a Job. Valid values are: - "Allow" (default): allows CronJobs to run concurrently; - "Forbid": forbids concurrent runs, skipping next run if previous run hasn't finished yet; - "Replace": cancels currently running job and replaces it with a new one
-	//
-	// Possible enum values:
-	//  - `"Allow"` allows CronJobs to run concurrently.
-	//  - `"Forbid"` forbids concurrent runs, skipping next run if previous hasn't finished yet.
-	//  - `"Replace"` cancels currently running job and replaces it with a new one.
 	ConcurrencyPolicy *string `pulumi:"concurrencyPolicy"`
 	// The number of failed finished jobs to retain. Value must be non-negative integer. Defaults to 1.
 	FailedJobsHistoryLimit *int `pulumi:"failedJobsHistoryLimit"`
@@ -251,6 +246,8 @@ type CronJobSpec struct {
 	SuccessfulJobsHistoryLimit *int `pulumi:"successfulJobsHistoryLimit"`
 	// This flag tells the controller to suspend subsequent executions, it does not apply to already started executions.  Defaults to false.
 	Suspend *bool `pulumi:"suspend"`
+	// The time zone for the given schedule, see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones. If not specified, this will rely on the time zone of the kube-controller-manager process. ALPHA: This field is in alpha and must be enabled via the `CronJobTimeZone` feature gate.
+	TimeZone *string `pulumi:"timeZone"`
 }
 
 // CronJobSpecInput is an input type that accepts CronJobSpecArgs and CronJobSpecOutput values.
@@ -267,11 +264,6 @@ type CronJobSpecInput interface {
 // CronJobSpec describes how the job execution will look like and when it will actually run.
 type CronJobSpecArgs struct {
 	// Specifies how to treat concurrent executions of a Job. Valid values are: - "Allow" (default): allows CronJobs to run concurrently; - "Forbid": forbids concurrent runs, skipping next run if previous run hasn't finished yet; - "Replace": cancels currently running job and replaces it with a new one
-	//
-	// Possible enum values:
-	//  - `"Allow"` allows CronJobs to run concurrently.
-	//  - `"Forbid"` forbids concurrent runs, skipping next run if previous hasn't finished yet.
-	//  - `"Replace"` cancels currently running job and replaces it with a new one.
 	ConcurrencyPolicy pulumi.StringPtrInput `pulumi:"concurrencyPolicy"`
 	// The number of failed finished jobs to retain. Value must be non-negative integer. Defaults to 1.
 	FailedJobsHistoryLimit pulumi.IntPtrInput `pulumi:"failedJobsHistoryLimit"`
@@ -285,6 +277,8 @@ type CronJobSpecArgs struct {
 	SuccessfulJobsHistoryLimit pulumi.IntPtrInput `pulumi:"successfulJobsHistoryLimit"`
 	// This flag tells the controller to suspend subsequent executions, it does not apply to already started executions.  Defaults to false.
 	Suspend pulumi.BoolPtrInput `pulumi:"suspend"`
+	// The time zone for the given schedule, see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones. If not specified, this will rely on the time zone of the kube-controller-manager process. ALPHA: This field is in alpha and must be enabled via the `CronJobTimeZone` feature gate.
+	TimeZone pulumi.StringPtrInput `pulumi:"timeZone"`
 }
 
 func (CronJobSpecArgs) ElementType() reflect.Type {
@@ -366,11 +360,6 @@ func (o CronJobSpecOutput) ToCronJobSpecPtrOutputWithContext(ctx context.Context
 }
 
 // Specifies how to treat concurrent executions of a Job. Valid values are: - "Allow" (default): allows CronJobs to run concurrently; - "Forbid": forbids concurrent runs, skipping next run if previous run hasn't finished yet; - "Replace": cancels currently running job and replaces it with a new one
-//
-// Possible enum values:
-//  - `"Allow"` allows CronJobs to run concurrently.
-//  - `"Forbid"` forbids concurrent runs, skipping next run if previous hasn't finished yet.
-//  - `"Replace"` cancels currently running job and replaces it with a new one.
 func (o CronJobSpecOutput) ConcurrencyPolicy() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v CronJobSpec) *string { return v.ConcurrencyPolicy }).(pulumi.StringPtrOutput)
 }
@@ -405,6 +394,11 @@ func (o CronJobSpecOutput) Suspend() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v CronJobSpec) *bool { return v.Suspend }).(pulumi.BoolPtrOutput)
 }
 
+// The time zone for the given schedule, see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones. If not specified, this will rely on the time zone of the kube-controller-manager process. ALPHA: This field is in alpha and must be enabled via the `CronJobTimeZone` feature gate.
+func (o CronJobSpecOutput) TimeZone() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v CronJobSpec) *string { return v.TimeZone }).(pulumi.StringPtrOutput)
+}
+
 type CronJobSpecPtrOutput struct{ *pulumi.OutputState }
 
 func (CronJobSpecPtrOutput) ElementType() reflect.Type {
@@ -430,11 +424,6 @@ func (o CronJobSpecPtrOutput) Elem() CronJobSpecOutput {
 }
 
 // Specifies how to treat concurrent executions of a Job. Valid values are: - "Allow" (default): allows CronJobs to run concurrently; - "Forbid": forbids concurrent runs, skipping next run if previous run hasn't finished yet; - "Replace": cancels currently running job and replaces it with a new one
-//
-// Possible enum values:
-//  - `"Allow"` allows CronJobs to run concurrently.
-//  - `"Forbid"` forbids concurrent runs, skipping next run if previous hasn't finished yet.
-//  - `"Replace"` cancels currently running job and replaces it with a new one.
 func (o CronJobSpecPtrOutput) ConcurrencyPolicy() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *CronJobSpec) *string {
 		if v == nil {
@@ -502,6 +491,16 @@ func (o CronJobSpecPtrOutput) Suspend() pulumi.BoolPtrOutput {
 		}
 		return v.Suspend
 	}).(pulumi.BoolPtrOutput)
+}
+
+// The time zone for the given schedule, see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones. If not specified, this will rely on the time zone of the kube-controller-manager process. ALPHA: This field is in alpha and must be enabled via the `CronJobTimeZone` feature gate.
+func (o CronJobSpecPtrOutput) TimeZone() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *CronJobSpec) *string {
+		if v == nil {
+			return nil
+		}
+		return v.TimeZone
+	}).(pulumi.StringPtrOutput)
 }
 
 // CronJobStatus represents the current state of a cron job.
@@ -1117,7 +1116,7 @@ type JobSpec struct {
 	//
 	// `Indexed` means that the Pods of a Job get an associated completion index from 0 to (.spec.completions - 1), available in the annotation batch.kubernetes.io/job-completion-index. The Job is considered complete when there is one successfully completed Pod for each index. When value is `Indexed`, .spec.completions must be specified and `.spec.parallelism` must be less than or equal to 10^5. In addition, The Pod name takes the form `$(job-name)-$(index)-$(random-string)`, the Pod hostname takes the form `$(job-name)-$(index)`.
 	//
-	// This field is beta-level. More completion modes can be added in the future. If the Job controller observes a mode that it doesn't recognize, the controller skips updates for the Job.
+	// More completion modes can be added in the future. If the Job controller observes a mode that it doesn't recognize, which is possible during upgrades due to version skew, the controller skips updates for the Job.
 	CompletionMode *string `pulumi:"completionMode"`
 	// Specifies the desired number of successfully finished pods the job should be run with.  Setting to nil means that the success of any pod signals the success of all pods, and allows parallelism to have any positive value.  Setting to 1 means that parallelism is limited to 1 and the success of that pod signals the success of the job. More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/
 	Completions *int `pulumi:"completions"`
@@ -1158,7 +1157,7 @@ type JobSpecArgs struct {
 	//
 	// `Indexed` means that the Pods of a Job get an associated completion index from 0 to (.spec.completions - 1), available in the annotation batch.kubernetes.io/job-completion-index. The Job is considered complete when there is one successfully completed Pod for each index. When value is `Indexed`, .spec.completions must be specified and `.spec.parallelism` must be less than or equal to 10^5. In addition, The Pod name takes the form `$(job-name)-$(index)-$(random-string)`, the Pod hostname takes the form `$(job-name)-$(index)`.
 	//
-	// This field is beta-level. More completion modes can be added in the future. If the Job controller observes a mode that it doesn't recognize, the controller skips updates for the Job.
+	// More completion modes can be added in the future. If the Job controller observes a mode that it doesn't recognize, which is possible during upgrades due to version skew, the controller skips updates for the Job.
 	CompletionMode pulumi.StringPtrInput `pulumi:"completionMode"`
 	// Specifies the desired number of successfully finished pods the job should be run with.  Setting to nil means that the success of any pod signals the success of all pods, and allows parallelism to have any positive value.  Setting to 1 means that parallelism is limited to 1 and the success of that pod signals the success of the job. More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/
 	Completions pulumi.IntPtrInput `pulumi:"completions"`
@@ -1270,7 +1269,7 @@ func (o JobSpecOutput) BackoffLimit() pulumi.IntPtrOutput {
 //
 // `Indexed` means that the Pods of a Job get an associated completion index from 0 to (.spec.completions - 1), available in the annotation batch.kubernetes.io/job-completion-index. The Job is considered complete when there is one successfully completed Pod for each index. When value is `Indexed`, .spec.completions must be specified and `.spec.parallelism` must be less than or equal to 10^5. In addition, The Pod name takes the form `$(job-name)-$(index)-$(random-string)`, the Pod hostname takes the form `$(job-name)-$(index)`.
 //
-// This field is beta-level. More completion modes can be added in the future. If the Job controller observes a mode that it doesn't recognize, the controller skips updates for the Job.
+// More completion modes can be added in the future. If the Job controller observes a mode that it doesn't recognize, which is possible during upgrades due to version skew, the controller skips updates for the Job.
 func (o JobSpecOutput) CompletionMode() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v JobSpec) *string { return v.CompletionMode }).(pulumi.StringPtrOutput)
 }
@@ -1360,7 +1359,7 @@ func (o JobSpecPtrOutput) BackoffLimit() pulumi.IntPtrOutput {
 //
 // `Indexed` means that the Pods of a Job get an associated completion index from 0 to (.spec.completions - 1), available in the annotation batch.kubernetes.io/job-completion-index. The Job is considered complete when there is one successfully completed Pod for each index. When value is `Indexed`, .spec.completions must be specified and `.spec.parallelism` must be less than or equal to 10^5. In addition, The Pod name takes the form `$(job-name)-$(index)-$(random-string)`, the Pod hostname takes the form `$(job-name)-$(index)`.
 //
-// This field is beta-level. More completion modes can be added in the future. If the Job controller observes a mode that it doesn't recognize, the controller skips updates for the Job.
+// More completion modes can be added in the future. If the Job controller observes a mode that it doesn't recognize, which is possible during upgrades due to version skew, the controller skips updates for the Job.
 func (o JobSpecPtrOutput) CompletionMode() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *JobSpec) *string {
 		if v == nil {
@@ -1454,7 +1453,7 @@ type JobStatus struct {
 	Failed *int `pulumi:"failed"`
 	// The number of pods which have a Ready condition.
 	//
-	// This field is alpha-level. The job controller populates the field when the feature gate JobReadyPods is enabled (disabled by default).
+	// This field is beta-level. The job controller populates the field when the feature gate JobReadyPods is enabled (enabled by default).
 	Ready *int `pulumi:"ready"`
 	// Represents time when the job controller started processing a job. When a Job is created in the suspended state, this field is not set until the first time it is resumed. This field is reset every time a Job is resumed from suspension. It is represented in RFC3339 form and is in UTC.
 	StartTime *string `pulumi:"startTime"`
@@ -1494,7 +1493,7 @@ type JobStatusArgs struct {
 	Failed pulumi.IntPtrInput `pulumi:"failed"`
 	// The number of pods which have a Ready condition.
 	//
-	// This field is alpha-level. The job controller populates the field when the feature gate JobReadyPods is enabled (disabled by default).
+	// This field is beta-level. The job controller populates the field when the feature gate JobReadyPods is enabled (enabled by default).
 	Ready pulumi.IntPtrInput `pulumi:"ready"`
 	// Represents time when the job controller started processing a job. When a Job is created in the suspended state, this field is not set until the first time it is resumed. This field is reset every time a Job is resumed from suspension. It is represented in RFC3339 form and is in UTC.
 	StartTime pulumi.StringPtrInput `pulumi:"startTime"`
@@ -1614,7 +1613,7 @@ func (o JobStatusOutput) Failed() pulumi.IntPtrOutput {
 
 // The number of pods which have a Ready condition.
 //
-// This field is alpha-level. The job controller populates the field when the feature gate JobReadyPods is enabled (disabled by default).
+// This field is beta-level. The job controller populates the field when the feature gate JobReadyPods is enabled (enabled by default).
 func (o JobStatusOutput) Ready() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v JobStatus) *int { return v.Ready }).(pulumi.IntPtrOutput)
 }
@@ -1715,7 +1714,7 @@ func (o JobStatusPtrOutput) Failed() pulumi.IntPtrOutput {
 
 // The number of pods which have a Ready condition.
 //
-// This field is alpha-level. The job controller populates the field when the feature gate JobReadyPods is enabled (disabled by default).
+// This field is beta-level. The job controller populates the field when the feature gate JobReadyPods is enabled (enabled by default).
 func (o JobStatusPtrOutput) Ready() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *JobStatus) *int {
 		if v == nil {

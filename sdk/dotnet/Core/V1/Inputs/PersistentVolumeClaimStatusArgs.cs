@@ -65,11 +65,6 @@ namespace Pulumi.Kubernetes.Types.Inputs.Core.V1
 
         /// <summary>
         /// phase represents the current phase of PersistentVolumeClaim.
-        /// 
-        /// Possible enum values:
-        ///  - `"Bound"` used for PersistentVolumeClaims that are bound
-        ///  - `"Lost"` used for PersistentVolumeClaims that lost their underlying PersistentVolume. The claim was bound to a PersistentVolume and this volume does not exist any longer and all data on it was lost.
-        ///  - `"Pending"` used for PersistentVolumeClaims that are not yet bound
         /// </summary>
         [Input("phase")]
         public Input<string>? Phase { get; set; }

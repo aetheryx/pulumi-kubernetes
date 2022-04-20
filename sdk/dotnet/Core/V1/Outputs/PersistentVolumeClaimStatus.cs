@@ -34,11 +34,6 @@ namespace Pulumi.Kubernetes.Types.Outputs.Core.V1
         public readonly ImmutableArray<Pulumi.Kubernetes.Types.Outputs.Core.V1.PersistentVolumeClaimCondition> Conditions;
         /// <summary>
         /// phase represents the current phase of PersistentVolumeClaim.
-        /// 
-        /// Possible enum values:
-        ///  - `"Bound"` used for PersistentVolumeClaims that are bound
-        ///  - `"Lost"` used for PersistentVolumeClaims that lost their underlying PersistentVolume. The claim was bound to a PersistentVolume and this volume does not exist any longer and all data on it was lost.
-        ///  - `"Pending"` used for PersistentVolumeClaims that are not yet bound
         /// </summary>
         public readonly string Phase;
         /// <summary>

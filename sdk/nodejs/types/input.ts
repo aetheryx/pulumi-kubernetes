@@ -1994,10 +1994,6 @@ export namespace apps {
             rollingUpdate?: pulumi.Input<inputs.apps.v1.RollingUpdateDaemonSet>;
             /**
              * Type of daemon set update. Can be "RollingUpdate" or "OnDelete". Default is RollingUpdate.
-             *
-             * Possible enum values:
-             *  - `"OnDelete"` Replace the old daemons only when it's killed
-             *  - `"RollingUpdate"` Replace the old daemons by new ones using rolling update i.e replace them on each node one after the other.
              */
             type?: pulumi.Input<string>;
         }
@@ -2166,10 +2162,6 @@ export namespace apps {
             rollingUpdate?: pulumi.Input<inputs.apps.v1.RollingUpdateDeployment>;
             /**
              * Type of deployment. Can be "Recreate" or "RollingUpdate". Default is RollingUpdate.
-             *
-             * Possible enum values:
-             *  - `"Recreate"` Kill all existing pods before creating new ones.
-             *  - `"RollingUpdate"` Replace the old ReplicaSets by new one using rolling update i.e gradually scale down the old ReplicaSets and scale up the new one.
              */
             type?: pulumi.Input<string>;
         }
@@ -2311,7 +2303,11 @@ export namespace apps {
          */
         export interface RollingUpdateStatefulSetStrategy {
             /**
-             * Partition indicates the ordinal at which the StatefulSet should be partitioned. Default value is 0.
+             * The maximum number of pods that can be unavailable during the update. Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%). Absolute number is calculated from percentage by rounding up. This can not be 0. Defaults to 1. This field is alpha-level and is only honored by servers that enable the MaxUnavailableStatefulSet feature. The field applies to all pods in the range 0 to Replicas-1. That means if there is any unavailable pod in the range 0 to Replicas-1, it will be counted towards MaxUnavailable.
+             */
+            maxUnavailable?: pulumi.Input<number | string>;
+            /**
+             * Partition indicates the ordinal at which the StatefulSet should be partitioned for updates. During a rolling update, all pods from ordinal Replicas-1 to Partition are updated. All pods from ordinal Partition-1 to 0 remain untouched. This is helpful in being able to do a canary based deployment. The default value is 0.
              */
             partition?: pulumi.Input<number>;
         }
@@ -2412,10 +2408,6 @@ export namespace apps {
             persistentVolumeClaimRetentionPolicy?: pulumi.Input<inputs.apps.v1.StatefulSetPersistentVolumeClaimRetentionPolicy>;
             /**
              * podManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down. The default policy is `OrderedReady`, where pods are created in increasing order (pod-0, then pod-1, etc) and the controller will wait until each pod is ready before continuing. When scaling down, the pods are removed in the opposite order. The alternative policy is `Parallel` which will create pods in parallel to match the desired scale without waiting, and on scale down will delete all pods at once.
-             *
-             * Possible enum values:
-             *  - `"OrderedReady"` will create pods in strictly increasing order on scale up and strictly decreasing order on scale down, progressing only when the previous pod is ready or terminated. At most one pod will be changed at any time.
-             *  - `"Parallel"` will create and delete pods as soon as the stateful set replica count is changed, and will not wait for pods to be ready or complete termination.
              */
             podManagementPolicy?: pulumi.Input<string>;
             /**
@@ -2455,7 +2447,7 @@ export namespace apps {
             /**
              * Total number of available pods (ready for at least minReadySeconds) targeted by this statefulset. This is a beta field and enabled/disabled by StatefulSetMinReadySeconds feature gate.
              */
-            availableReplicas: pulumi.Input<number>;
+            availableReplicas?: pulumi.Input<number>;
             /**
              * collisionCount is the count of hash collisions for the StatefulSet. The StatefulSet controller uses this field as a collision avoidance mechanism when it needs to create the name for the newest ControllerRevision.
              */
@@ -2504,10 +2496,6 @@ export namespace apps {
             rollingUpdate?: pulumi.Input<inputs.apps.v1.RollingUpdateStatefulSetStrategy>;
             /**
              * Type indicates the type of the StatefulSetUpdateStrategy. Default is RollingUpdate.
-             *
-             * Possible enum values:
-             *  - `"OnDelete"` triggers the legacy behavior. Version tracking and ordered rolling restarts are disabled. Pods are recreated from the StatefulSetSpec when they are manually deleted. When a scale operation is performed with this strategy,specification version indicated by the StatefulSet's currentRevision.
-             *  - `"RollingUpdate"` indicates that update will be applied to all Pods in the StatefulSet with respect to the StatefulSet ordering constraints. When a scale operation is performed with this strategy, new Pods will be created from the specification version indicated by the StatefulSet's updateRevision.
              */
             type?: pulumi.Input<string>;
         }
@@ -5377,11 +5365,6 @@ export namespace batch {
         export interface CronJobSpec {
             /**
              * Specifies how to treat concurrent executions of a Job. Valid values are: - "Allow" (default): allows CronJobs to run concurrently; - "Forbid": forbids concurrent runs, skipping next run if previous run hasn't finished yet; - "Replace": cancels currently running job and replaces it with a new one
-             *
-             * Possible enum values:
-             *  - `"Allow"` allows CronJobs to run concurrently.
-             *  - `"Forbid"` forbids concurrent runs, skipping next run if previous hasn't finished yet.
-             *  - `"Replace"` cancels currently running job and replaces it with a new one.
              */
             concurrencyPolicy?: pulumi.Input<string>;
             /**
@@ -5408,6 +5391,10 @@ export namespace batch {
              * This flag tells the controller to suspend subsequent executions, it does not apply to already started executions.  Defaults to false.
              */
             suspend?: pulumi.Input<boolean>;
+            /**
+             * The time zone for the given schedule, see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones. If not specified, this will rely on the time zone of the kube-controller-manager process. ALPHA: This field is in alpha and must be enabled via the `CronJobTimeZone` feature gate.
+             */
+            timeZone?: pulumi.Input<string>;
         }
 
         /**
@@ -5523,7 +5510,7 @@ export namespace batch {
              *
              * `Indexed` means that the Pods of a Job get an associated completion index from 0 to (.spec.completions - 1), available in the annotation batch.kubernetes.io/job-completion-index. The Job is considered complete when there is one successfully completed Pod for each index. When value is `Indexed`, .spec.completions must be specified and `.spec.parallelism` must be less than or equal to 10^5. In addition, The Pod name takes the form `$(job-name)-$(index)-$(random-string)`, the Pod hostname takes the form `$(job-name)-$(index)`.
              *
-             * This field is beta-level. More completion modes can be added in the future. If the Job controller observes a mode that it doesn't recognize, the controller skips updates for the Job.
+             * More completion modes can be added in the future. If the Job controller observes a mode that it doesn't recognize, which is possible during upgrades due to version skew, the controller skips updates for the Job.
              */
             completionMode?: pulumi.Input<string>;
             /**
@@ -5583,7 +5570,7 @@ export namespace batch {
             /**
              * The number of pods which have a Ready condition.
              *
-             * This field is alpha-level. The job controller populates the field when the feature gate JobReadyPods is enabled (disabled by default).
+             * This field is beta-level. The job controller populates the field when the feature gate JobReadyPods is enabled (enabled by default).
              */
             ready?: pulumi.Input<number>;
             /**
@@ -5693,6 +5680,10 @@ export namespace batch {
              * This flag tells the controller to suspend subsequent executions, it does not apply to already started executions.  Defaults to false.
              */
             suspend?: pulumi.Input<boolean>;
+            /**
+             * The time zone for the given schedule, see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones. If not specified, this will rely on the time zone of the kube-controller-manager process. ALPHA: This field is in alpha and must be enabled via the `CronJobTimeZone` feature gate.
+             */
+            timeZone?: pulumi.Input<string>;
         }
 
         /**
@@ -5886,11 +5877,6 @@ export namespace certificates {
              * Approved and Denied conditions are mutually exclusive. Approved, Denied, and Failed conditions cannot be removed once added.
              *
              * Only one condition of a given type is allowed.
-             *
-             * Possible enum values:
-             *  - `"Approved"` Approved indicates the request was approved and should be issued by the signer.
-             *  - `"Denied"` Denied indicates the request was denied and should not be issued by the signer.
-             *  - `"Failed"` Failed indicates the signer failed to issue the certificate.
              */
             type: pulumi.Input<string>;
         }
@@ -6704,11 +6690,6 @@ export namespace core {
             image?: pulumi.Input<string>;
             /**
              * Image pull policy. One of Always, Never, IfNotPresent. Defaults to Always if :latest tag is specified, or IfNotPresent otherwise. Cannot be updated. More info: https://kubernetes.io/docs/concepts/containers/images#updating-images
-             *
-             * Possible enum values:
-             *  - `"Always"` means that kubelet always attempts to pull the latest image. Container will fail If the pull fails.
-             *  - `"IfNotPresent"` means that kubelet pulls if the image isn't present on disk. Container will fail if the image isn't present and the pull fails.
-             *  - `"Never"` means that kubelet never pulls an image, but only uses a local image. Container will fail if the image isn't present
              */
             imagePullPolicy?: pulumi.Input<string>;
             /**
@@ -6757,10 +6738,6 @@ export namespace core {
             terminationMessagePath?: pulumi.Input<string>;
             /**
              * Indicate how the termination message should be populated. File will use the contents of terminationMessagePath to populate the container status message on both success and failure. FallbackToLogsOnError will use the last chunk of container log output if the termination message file is empty and the container exited with an error. The log output is limited to 2048 bytes or 80 lines, whichever is smaller. Defaults to File. Cannot be updated.
-             *
-             * Possible enum values:
-             *  - `"FallbackToLogsOnError"` will read the most recent contents of the container logs for the container status message when the container exits with an error and the terminationMessagePath has no contents.
-             *  - `"File"` is the default behavior and will set the container status message to the contents of the container's terminationMessagePath when the container exits.
              */
             terminationMessagePolicy?: pulumi.Input<string>;
             /**
@@ -6817,11 +6794,6 @@ export namespace core {
             name?: pulumi.Input<string>;
             /**
              * Protocol for port. Must be UDP, TCP, or SCTP. Defaults to "TCP".
-             *
-             * Possible enum values:
-             *  - `"SCTP"` is the SCTP protocol.
-             *  - `"TCP"` is the TCP protocol.
-             *  - `"UDP"` is the UDP protocol.
              */
             protocol?: pulumi.Input<string>;
         }
@@ -7054,11 +7026,6 @@ export namespace core {
             port: pulumi.Input<number>;
             /**
              * The IP protocol for this port. Must be UDP, TCP, or SCTP. Default is TCP.
-             *
-             * Possible enum values:
-             *  - `"SCTP"` is the SCTP protocol.
-             *  - `"TCP"` is the TCP protocol.
-             *  - `"UDP"` is the UDP protocol.
              */
             protocol?: pulumi.Input<string>;
         }
@@ -7209,11 +7176,6 @@ export namespace core {
             image?: pulumi.Input<string>;
             /**
              * Image pull policy. One of Always, Never, IfNotPresent. Defaults to Always if :latest tag is specified, or IfNotPresent otherwise. Cannot be updated. More info: https://kubernetes.io/docs/concepts/containers/images#updating-images
-             *
-             * Possible enum values:
-             *  - `"Always"` means that kubelet always attempts to pull the latest image. Container will fail If the pull fails.
-             *  - `"IfNotPresent"` means that kubelet pulls if the image isn't present on disk. Container will fail if the image isn't present and the pull fails.
-             *  - `"Never"` means that kubelet never pulls an image, but only uses a local image. Container will fail if the image isn't present
              */
             imagePullPolicy?: pulumi.Input<string>;
             /**
@@ -7268,10 +7230,6 @@ export namespace core {
             terminationMessagePath?: pulumi.Input<string>;
             /**
              * Indicate how the termination message should be populated. File will use the contents of terminationMessagePath to populate the container status message on both success and failure. FallbackToLogsOnError will use the last chunk of container log output if the termination message file is empty and the container exited with an error. The log output is limited to 2048 bytes or 80 lines, whichever is smaller. Defaults to File. Cannot be updated.
-             *
-             * Possible enum values:
-             *  - `"FallbackToLogsOnError"` will read the most recent contents of the container logs for the container status message when the container exits with an error and the terminationMessagePath has no contents.
-             *  - `"File"` is the default behavior and will set the container status message to the contents of the container's terminationMessagePath when the container exits.
              */
             terminationMessagePolicy?: pulumi.Input<string>;
             /**
@@ -7639,10 +7597,6 @@ export namespace core {
             port: pulumi.Input<number | string>;
             /**
              * Scheme to use for connecting to the host. Defaults to HTTP.
-             *
-             * Possible enum values:
-             *  - `"HTTP"` means that the scheme used will be http://
-             *  - `"HTTPS"` means that the scheme used will be https://
              */
             scheme?: pulumi.Input<string>;
         }
@@ -8034,10 +7988,6 @@ export namespace core {
             conditions?: pulumi.Input<pulumi.Input<inputs.core.v1.NamespaceCondition>[]>;
             /**
              * Phase is the current lifecycle phase of the namespace. More info: https://kubernetes.io/docs/tasks/administer-cluster/namespaces/
-             *
-             * Possible enum values:
-             *  - `"Active"` means the namespace is available for use in the system
-             *  - `"Terminating"` means the namespace is undergoing graceful termination
              */
             phase?: pulumi.Input<string>;
         }
@@ -8188,14 +8138,6 @@ export namespace core {
             key: pulumi.Input<string>;
             /**
              * Represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
-             *
-             * Possible enum values:
-             *  - `"DoesNotExist"`
-             *  - `"Exists"`
-             *  - `"Gt"`
-             *  - `"In"`
-             *  - `"Lt"`
-             *  - `"NotIn"`
              */
             operator: pulumi.Input<string>;
             /**
@@ -8290,11 +8232,6 @@ export namespace core {
             nodeInfo?: pulumi.Input<inputs.core.v1.NodeSystemInfo>;
             /**
              * NodePhase is the recently observed lifecycle phase of the node. More info: https://kubernetes.io/docs/concepts/nodes/node/#phase The field is never populated, and now is deprecated.
-             *
-             * Possible enum values:
-             *  - `"Pending"` means the node has been created/added by the system, but not configured.
-             *  - `"Running"` means the node has been configured and has Kubernetes components running.
-             *  - `"Terminated"` means the node has been removed from the cluster.
              */
             phase?: pulumi.Input<string>;
             /**
@@ -8320,7 +8257,7 @@ export namespace core {
              */
             bootID: pulumi.Input<string>;
             /**
-             * ContainerRuntime Version reported by the node through runtime remote API (e.g. docker://1.5.0).
+             * ContainerRuntime Version reported by the node through runtime remote API (e.g. containerd://1.4.2).
              */
             containerRuntimeVersion: pulumi.Input<string>;
             /**
@@ -8495,7 +8432,7 @@ export namespace core {
              * * While DataSource ignores disallowed values (dropping them), DataSourceRef
              *   preserves all values, and generates an error if a disallowed value is
              *   specified.
-             * (Alpha) Using this field requires the AnyVolumeDataSource feature gate to be enabled.
+             * (Beta) Using this field requires the AnyVolumeDataSource feature gate to be enabled.
              */
             dataSourceRef?: pulumi.Input<inputs.core.v1.TypedLocalObjectReference>;
             /**
@@ -8542,11 +8479,6 @@ export namespace core {
             conditions?: pulumi.Input<pulumi.Input<inputs.core.v1.PersistentVolumeClaimCondition>[]>;
             /**
              * phase represents the current phase of PersistentVolumeClaim.
-             *
-             * Possible enum values:
-             *  - `"Bound"` used for PersistentVolumeClaims that are bound
-             *  - `"Lost"` used for PersistentVolumeClaims that lost their underlying PersistentVolume. The claim was bound to a PersistentVolume and this volume does not exist any longer and all data on it was lost.
-             *  - `"Pending"` used for PersistentVolumeClaims that are not yet bound
              */
             phase?: pulumi.Input<string>;
             /**
@@ -8669,11 +8601,6 @@ export namespace core {
             nodeAffinity?: pulumi.Input<inputs.core.v1.VolumeNodeAffinity>;
             /**
              * persistentVolumeReclaimPolicy defines what happens to a persistent volume when released from its claim. Valid options are Retain (default for manually created PersistentVolumes), Delete (default for dynamically provisioned PersistentVolumes), and Recycle (deprecated). Recycle must be supported by the volume plugin underlying this PersistentVolume. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#reclaiming
-             *
-             * Possible enum values:
-             *  - `"Delete"` means the volume will be deleted from Kubernetes on release from its claim. The volume plugin must support Deletion.
-             *  - `"Recycle"` means the volume will be recycled back into the pool of unbound persistent volumes on release from its claim. The volume plugin must support Recycling.
-             *  - `"Retain"` means the volume will be left in its current phase (Released) for manual reclamation by the administrator. The default policy is Retain.
              */
             persistentVolumeReclaimPolicy?: pulumi.Input<string>;
             /**
@@ -8724,13 +8651,6 @@ export namespace core {
             message?: pulumi.Input<string>;
             /**
              * phase indicates if a volume is available, bound to a claim, or released by a claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#phase
-             *
-             * Possible enum values:
-             *  - `"Available"` used for PersistentVolumes that are not yet bound Available volumes are held by the binder and matched to PersistentVolumeClaims
-             *  - `"Bound"` used for PersistentVolumes that are bound
-             *  - `"Failed"` used for PersistentVolumes that failed to be correctly recycled or deleted after being released from a claim
-             *  - `"Pending"` used for PersistentVolumes that are not available
-             *  - `"Released"` used for PersistentVolumes where the bound PersistentVolumeClaim was deleted released volumes must be recycled before becoming available again this phase is used by the persistent volume claim binder to signal to another process to reclaim the resource
              */
             phase?: pulumi.Input<string>;
             /**
@@ -9010,12 +8930,6 @@ export namespace core {
             dnsConfig?: pulumi.Input<inputs.core.v1.PodDNSConfig>;
             /**
              * Set DNS policy for the pod. Defaults to "ClusterFirst". Valid values are 'ClusterFirstWithHostNet', 'ClusterFirst', 'Default' or 'None'. DNS parameters given in DNSConfig will be merged with the policy selected with DNSPolicy. To have DNS options set along with hostNetwork, you have to specify DNS policy explicitly to 'ClusterFirstWithHostNet'.
-             *
-             * Possible enum values:
-             *  - `"ClusterFirst"` indicates that the pod should use cluster DNS first unless hostNetwork is true, if it is available, then fall back on the default (as determined by kubelet) DNS settings.
-             *  - `"ClusterFirstWithHostNet"` indicates that the pod should use cluster DNS first, if it is available, then fall back on the default (as determined by kubelet) DNS settings.
-             *  - `"Default"` indicates that the pod should use the default (as determined by kubelet) DNS settings.
-             *  - `"None"` indicates that the pod should use empty DNS settings. DNS parameters such as nameservers and search paths should be defined via DNSConfig.
              */
             dnsPolicy?: pulumi.Input<string>;
             /**
@@ -9047,7 +8961,7 @@ export namespace core {
              */
             hostname?: pulumi.Input<string>;
             /**
-             * ImagePullSecrets is an optional list of references to secrets in the same namespace to use for pulling any of the images used by this PodSpec. If specified, these secrets will be passed to individual puller implementations for them to use. For example, in the case of docker, only DockerConfig type secrets are honored. More info: https://kubernetes.io/docs/concepts/containers/images#specifying-imagepullsecrets-on-a-pod
+             * ImagePullSecrets is an optional list of references to secrets in the same namespace to use for pulling any of the images used by this PodSpec. If specified, these secrets will be passed to individual puller implementations for them to use. More info: https://kubernetes.io/docs/concepts/containers/images#specifying-imagepullsecrets-on-a-pod
              */
             imagePullSecrets?: pulumi.Input<pulumi.Input<inputs.core.v1.LocalObjectReference>[]>;
             /**
@@ -9067,7 +8981,7 @@ export namespace core {
              *
              * If the OS field is set to linux, the following fields must be unset: -securityContext.windowsOptions
              *
-             * If the OS field is set to windows, following fields must be unset: - spec.hostPID - spec.hostIPC - spec.securityContext.seLinuxOptions - spec.securityContext.seccompProfile - spec.securityContext.fsGroup - spec.securityContext.fsGroupChangePolicy - spec.securityContext.sysctls - spec.shareProcessNamespace - spec.securityContext.runAsUser - spec.securityContext.runAsGroup - spec.securityContext.supplementalGroups - spec.containers[*].securityContext.seLinuxOptions - spec.containers[*].securityContext.seccompProfile - spec.containers[*].securityContext.capabilities - spec.containers[*].securityContext.readOnlyRootFilesystem - spec.containers[*].securityContext.privileged - spec.containers[*].securityContext.allowPrivilegeEscalation - spec.containers[*].securityContext.procMount - spec.containers[*].securityContext.runAsUser - spec.containers[*].securityContext.runAsGroup This is an alpha field and requires the IdentifyPodOS feature
+             * If the OS field is set to windows, following fields must be unset: - spec.hostPID - spec.hostIPC - spec.securityContext.seLinuxOptions - spec.securityContext.seccompProfile - spec.securityContext.fsGroup - spec.securityContext.fsGroupChangePolicy - spec.securityContext.sysctls - spec.shareProcessNamespace - spec.securityContext.runAsUser - spec.securityContext.runAsGroup - spec.securityContext.supplementalGroups - spec.containers[*].securityContext.seLinuxOptions - spec.containers[*].securityContext.seccompProfile - spec.containers[*].securityContext.capabilities - spec.containers[*].securityContext.readOnlyRootFilesystem - spec.containers[*].securityContext.privileged - spec.containers[*].securityContext.allowPrivilegeEscalation - spec.containers[*].securityContext.procMount - spec.containers[*].securityContext.runAsUser - spec.containers[*].securityContext.runAsGroup This is a beta field and requires the IdentifyPodOS feature
              */
             os?: pulumi.Input<inputs.core.v1.PodOS>;
             /**
@@ -9092,11 +9006,6 @@ export namespace core {
             readinessGates?: pulumi.Input<pulumi.Input<inputs.core.v1.PodReadinessGate>[]>;
             /**
              * Restart policy for all containers within the pod. One of Always, OnFailure, Never. Default to Always. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#restart-policy
-             *
-             * Possible enum values:
-             *  - `"Always"`
-             *  - `"Never"`
-             *  - `"OnFailure"`
              */
             restartPolicy?: pulumi.Input<string>;
             /**
@@ -9187,13 +9096,6 @@ export namespace core {
              * Pending: The pod has been accepted by the Kubernetes system, but one or more of the container images has not been created. This includes time before being scheduled as well as time spent downloading images over the network, which could take a while. Running: The pod has been bound to a node, and all of the containers have been created. At least one container is still running, or is in the process of starting or restarting. Succeeded: All containers in the pod have terminated in success, and will not be restarted. Failed: All containers in the pod have terminated, and at least one container has terminated in failure. The container either exited with non-zero status or was terminated by the system. Unknown: For some reason the state of the pod could not be obtained, typically due to an error in communicating with the host of the pod.
              *
              * More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-phase
-             *
-             * Possible enum values:
-             *  - `"Failed"` means that all containers in the pod have terminated, and at least one container has terminated in a failure (exited with a non-zero exit code or was stopped by the system).
-             *  - `"Pending"` means the pod has been accepted by the system, but one or more of the containers has not been started. This includes time before being bound to a node, as well as time spent pulling images onto the host.
-             *  - `"Running"` means the pod has been bound to a node and all of the containers have been started. At least one container is still running or is in the process of being restarted.
-             *  - `"Succeeded"` means that all containers in the pod have voluntarily terminated with a container exit code of 0, and the system is not going to restart any of these containers.
-             *  - `"Unknown"` means that for some reason the state of the pod could not be obtained, typically due to an error in communicating with the host of the pod. Deprecated: It isn't being set since 2015 (74da3b14b0c0f658b3bb8d2def5094686d0e9095)
              */
             phase?: pulumi.Input<string>;
             /**
@@ -9206,11 +9108,6 @@ export namespace core {
             podIPs?: pulumi.Input<pulumi.Input<inputs.core.v1.PodIP>[]>;
             /**
              * The Quality of Service (QOS) classification assigned to the pod based on resource requirements See PodQOSClass type for available QOS classes More info: https://git.k8s.io/community/contributors/design-proposals/node/resource-qos.md
-             *
-             * Possible enum values:
-             *  - `"BestEffort"` is the BestEffort qos class.
-             *  - `"Burstable"` is the Burstable qos class.
-             *  - `"Guaranteed"` is the Guaranteed qos class.
              */
             qosClass?: pulumi.Input<string>;
             /**
@@ -9273,11 +9170,6 @@ export namespace core {
             port: pulumi.Input<number>;
             /**
              * Protocol is the protocol of the service port of which status is recorded here The supported values are: "TCP", "UDP", "SCTP"
-             *
-             * Possible enum values:
-             *  - `"SCTP"` is the SCTP protocol.
-             *  - `"TCP"` is the TCP protocol.
-             *  - `"UDP"` is the UDP protocol.
              */
             protocol: pulumi.Input<string>;
         }
@@ -9327,7 +9219,7 @@ export namespace core {
              */
             failureThreshold?: pulumi.Input<number>;
             /**
-             * GRPC specifies an action involving a GRPC port. This is an alpha field and requires enabling GRPCContainerProbe feature gate.
+             * GRPC specifies an action involving a GRPC port. This is a beta field and requires enabling GRPCContainerProbe feature gate.
              */
             grpc?: pulumi.Input<inputs.core.v1.GRPCAction>;
             /**
@@ -9804,24 +9696,10 @@ export namespace core {
         export interface ScopedResourceSelectorRequirement {
             /**
              * Represents a scope's relationship to a set of values. Valid operators are In, NotIn, Exists, DoesNotExist.
-             *
-             * Possible enum values:
-             *  - `"DoesNotExist"`
-             *  - `"Exists"`
-             *  - `"In"`
-             *  - `"NotIn"`
              */
             operator: pulumi.Input<string>;
             /**
              * The name of the scope that the selector applies to.
-             *
-             * Possible enum values:
-             *  - `"BestEffort"` Match all pod objects that have best effort quality of service
-             *  - `"CrossNamespacePodAffinity"` Match all pod objects that have cross-namespace pod (anti)affinity mentioned.
-             *  - `"NotBestEffort"` Match all pod objects that do not have best effort quality of service
-             *  - `"NotTerminating"` Match all pod objects where spec.activeDeadlineSeconds is nil
-             *  - `"PriorityClass"` Match all pod objects that have priority class mentioned
-             *  - `"Terminating"` Match all pod objects where spec.activeDeadlineSeconds >=0
              */
             scopeName: pulumi.Input<string>;
             /**
@@ -9842,11 +9720,6 @@ export namespace core {
              * type indicates which kind of seccomp profile will be applied. Valid options are:
              *
              * Localhost - a profile defined in a file on the node should be used. RuntimeDefault - the container runtime default profile should be used. Unconfined - no profile should be applied.
-             *
-             * Possible enum values:
-             *  - `"Localhost"` indicates a profile defined in a file on the node should be used. The file's location relative to <kubelet-root-dir>/seccomp.
-             *  - `"RuntimeDefault"` represents the default container runtime seccomp profile.
-             *  - `"Unconfined"` indicates no seccomp profile is applied (A.K.A. unconfined).
              */
             type: pulumi.Input<string>;
         }
@@ -10158,11 +10031,6 @@ export namespace core {
             port: pulumi.Input<number>;
             /**
              * The IP protocol for this port. Supports "TCP", "UDP", and "SCTP". Default is TCP.
-             *
-             * Possible enum values:
-             *  - `"SCTP"` is the SCTP protocol.
-             *  - `"TCP"` is the TCP protocol.
-             *  - `"UDP"` is the UDP protocol.
              */
             protocol?: pulumi.Input<string>;
             /**
@@ -10199,10 +10067,6 @@ export namespace core {
             externalName?: pulumi.Input<string>;
             /**
              * externalTrafficPolicy denotes if this Service desires to route external traffic to node-local or cluster-wide endpoints. "Local" preserves the client source IP and avoids a second hop for LoadBalancer and Nodeport type services, but risks potentially imbalanced traffic spreading. "Cluster" obscures the client source IP and may cause a second hop to another node, but should have good overall load-spreading.
-             *
-             * Possible enum values:
-             *  - `"Cluster"` specifies node-global (legacy) behavior.
-             *  - `"Local"` specifies node-local endpoints behavior.
              */
             externalTrafficPolicy?: pulumi.Input<string>;
             /**
@@ -10253,10 +10117,6 @@ export namespace core {
             selector?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
             /**
              * Supports "ClientIP" and "None". Used to maintain session affinity. Enable client IP based session affinity. Must be ClientIP or None. Defaults to None. More info: https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies
-             *
-             * Possible enum values:
-             *  - `"ClientIP"` is the Client IP based.
-             *  - `"None"` - no session affinity.
              */
             sessionAffinity?: pulumi.Input<string>;
             /**
@@ -10269,12 +10129,6 @@ export namespace core {
             topologyKeys?: pulumi.Input<pulumi.Input<string>[]>;
             /**
              * type determines how the Service is exposed. Defaults to ClusterIP. Valid options are ExternalName, ClusterIP, NodePort, and LoadBalancer. "ClusterIP" allocates a cluster-internal IP address for load-balancing to endpoints. Endpoints are determined by the selector or if that is not specified, by manual construction of an Endpoints object or EndpointSlice objects. If clusterIP is "None", no virtual IP is allocated and the endpoints are published as a set of endpoints rather than a virtual IP. "NodePort" builds on ClusterIP and allocates a port on every node which routes to the same endpoints as the clusterIP. "LoadBalancer" builds on NodePort and creates an external load-balancer (if supported in the current cloud) which routes to the same endpoints as the clusterIP. "ExternalName" aliases this service to the specified externalName. Several other fields do not apply to ExternalName services. More info: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
-             *
-             * Possible enum values:
-             *  - `"ClusterIP"` means a service will only be accessible inside the cluster, via the cluster IP.
-             *  - `"ExternalName"` means a service consists of only a reference to an external name that kubedns or equivalent will return as a CNAME record, with no exposing or proxying of any pods involved.
-             *  - `"LoadBalancer"` means a service will be exposed via an external load balancer (if the cloud provider supports it), in addition to 'NodePort' type.
-             *  - `"NodePort"` means a service will be exposed on one port of every node, in addition to 'ClusterIP' type.
              */
             type?: pulumi.Input<string | enums.core.v1.ServiceSpecType>;
         }
@@ -10389,11 +10243,6 @@ export namespace core {
         export interface Taint {
             /**
              * Required. The effect of the taint on pods that do not tolerate the taint. Valid effects are NoSchedule, PreferNoSchedule and NoExecute.
-             *
-             * Possible enum values:
-             *  - `"NoExecute"` Evict any already-running pods that do not tolerate the taint. Currently enforced by NodeController.
-             *  - `"NoSchedule"` Do not allow new pods to schedule onto the node unless they tolerate the taint, but allow all pods submitted to Kubelet without going through the scheduler to start, and allow all already-running pods to continue running. Enforced by the scheduler.
-             *  - `"PreferNoSchedule"` Like TaintEffectNoSchedule, but the scheduler tries not to schedule new pods onto the node, rather than prohibiting new pods from scheduling onto the node entirely. Enforced by the scheduler.
              */
             effect: pulumi.Input<string>;
             /**
@@ -10416,11 +10265,6 @@ export namespace core {
         export interface Toleration {
             /**
              * Effect indicates the taint effect to match. Empty means match all taint effects. When specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.
-             *
-             * Possible enum values:
-             *  - `"NoExecute"` Evict any already-running pods that do not tolerate the taint. Currently enforced by NodeController.
-             *  - `"NoSchedule"` Do not allow new pods to schedule onto the node unless they tolerate the taint, but allow all pods submitted to Kubelet without going through the scheduler to start, and allow all already-running pods to continue running. Enforced by the scheduler.
-             *  - `"PreferNoSchedule"` Like TaintEffectNoSchedule, but the scheduler tries not to schedule new pods onto the node, rather than prohibiting new pods from scheduling onto the node entirely. Enforced by the scheduler.
              */
             effect?: pulumi.Input<string>;
             /**
@@ -10429,10 +10273,6 @@ export namespace core {
             key?: pulumi.Input<string>;
             /**
              * Operator represents a key's relationship to the value. Valid operators are Exists and Equal. Defaults to Equal. Exists is equivalent to wildcard for value, so that a pod can tolerate all taints of a particular category.
-             *
-             * Possible enum values:
-             *  - `"Equal"`
-             *  - `"Exists"`
              */
             operator?: pulumi.Input<string>;
             /**
@@ -10498,10 +10338,6 @@ export namespace core {
              *   but giving higher precedence to topologies that would help reduce the
              *   skew.
              * A constraint is considered "Unsatisfiable" for an incoming pod if and only if every possible node assignment for that pod would violate "MaxSkew" on some topology. For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same labelSelector spread as 3/1/1: | zone1 | zone2 | zone3 | | P P P |   P   |   P   | If WhenUnsatisfiable is set to DoNotSchedule, incoming pod can only be scheduled to zone2(zone3) to become 3/2/1(3/1/2) as ActualSkew(2-1) on zone2(zone3) satisfies MaxSkew(1). In other words, the cluster can still be imbalanced, but scheduler won't make it *more* imbalanced. It's a required field.
-             *
-             * Possible enum values:
-             *  - `"DoNotSchedule"` instructs the scheduler not to schedule the pod when constraints are not satisfied.
-             *  - `"ScheduleAnyway"` instructs the scheduler to schedule the pod even if constraints are not satisfied.
              */
             whenUnsatisfiable: pulumi.Input<string>;
         }
@@ -10896,11 +10732,6 @@ export namespace discovery {
         export interface EndpointSlice {
             /**
              * addressType specifies the type of address carried by this EndpointSlice. All addresses in this slice must be the same type. This field is immutable after creation. The following address types are currently supported: * IPv4: Represents an IPv4 Address. * IPv6: Represents an IPv6 Address. * FQDN: Represents a Fully Qualified Domain Name.
-             *
-             * Possible enum values:
-             *  - `"FQDN"` represents a FQDN.
-             *  - `"IPv4"` represents an IPv4 Address.
-             *  - `"IPv6"` represents an IPv6 Address.
              */
             addressType: pulumi.Input<string>;
             /**
@@ -13486,7 +13317,9 @@ export namespace meta {
              */
             annotations?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
             /**
-             * The name of the cluster which the object belongs to. This is used to distinguish resources with same name and namespace in different clusters. This field is not set anywhere right now and apiserver is going to ignore it if set in create or update request.
+             * Deprecated: ClusterName is a legacy field that was always cleared by the system and never used; it will be removed completely in 1.25.
+             *
+             * The name in the go struct is changed to help clients detect accidental use.
              */
             clusterName?: pulumi.Input<string>;
             /**
@@ -13512,7 +13345,7 @@ export namespace meta {
             /**
              * GenerateName is an optional prefix, used by the server, to generate a unique name ONLY IF the Name field has not been provided. If this field is used, the name returned to the client will be different than the name passed. This value will also be combined with a unique suffix. The provided value has the same validation rules as the Name field, and may be truncated by the length of the suffix required to make the value unique on the server.
              *
-             * If this field is specified and the generated name exists, the server will NOT return a 409 - instead, it will either return 201 Created or 500 with Reason ServerTimeout indicating a unique name could not be found in the time allotted, and the client should retry (optionally after the time indicated in the Retry-After header).
+             * If this field is specified and the generated name exists, the server will return a 409.
              *
              * Applied only if Name is not specified. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#idempotency
              */
@@ -13914,6 +13747,10 @@ export namespace networking {
              * Specification of the desired behavior for this NetworkPolicy.
              */
             spec?: pulumi.Input<inputs.networking.v1.NetworkPolicySpec>;
+            /**
+             * Status is the current state of the NetworkPolicy. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+             */
+            status?: pulumi.Input<inputs.networking.v1.NetworkPolicyStatus>;
         }
 
         /**
@@ -14004,6 +13841,16 @@ export namespace networking {
              * List of rule types that the NetworkPolicy relates to. Valid options are ["Ingress"], ["Egress"], or ["Ingress", "Egress"]. If this field is not specified, it will default based on the existence of Ingress or Egress rules; policies that contain an Egress section are assumed to affect Egress, and all policies (whether or not they contain an Ingress section) are assumed to affect Ingress. If you want to write an egress-only policy, you must explicitly specify policyTypes [ "Egress" ]. Likewise, if you want to write a policy that specifies that no egress is allowed, you must specify a policyTypes value that include "Egress" (since such a policy would not include an Egress section and would otherwise default to just [ "Ingress" ]). This field is beta-level in 1.8
              */
             policyTypes?: pulumi.Input<pulumi.Input<string>[]>;
+        }
+
+        /**
+         * NetworkPolicyStatus describe the current state of the NetworkPolicy.
+         */
+        export interface NetworkPolicyStatus {
+            /**
+             * Conditions holds an array of metav1.Condition that describe the state of the NetworkPolicy. Current service state
+             */
+            conditions?: pulumi.Input<pulumi.Input<inputs.meta.v1.Condition>[]>;
         }
 
         /**
@@ -15619,8 +15466,6 @@ export namespace storage {
              * Alternatively, the driver can be deployed with the field unset or false and it can be flipped later when storage capacity information has been published.
              *
              * This field was immutable in Kubernetes <= 1.22 and now is mutable.
-             *
-             * This is a beta field and only available when the CSIStorageCapacity feature is enabled. The default is false.
              */
             storageCapacity?: pulumi.Input<boolean>;
             /**
@@ -15695,6 +15540,56 @@ export namespace storage {
              * drivers is a list of information of all CSI Drivers existing on a node. If all drivers in the list are uninstalled, this can become empty.
              */
             drivers: pulumi.Input<pulumi.Input<inputs.storage.v1.CSINodeDriver>[]>;
+        }
+
+        /**
+         * CSIStorageCapacity stores the result of one CSI GetCapacity call. For a given StorageClass, this describes the available capacity in a particular topology segment.  This can be used when considering where to instantiate new PersistentVolumes.
+         *
+         * For example this can express things like: - StorageClass "standard" has "1234 GiB" available in "topology.kubernetes.io/zone=us-east1" - StorageClass "localssd" has "10 GiB" available in "kubernetes.io/hostname=knode-abc123"
+         *
+         * The following three cases all imply that no capacity is available for a certain combination: - no object exists with suitable topology and storage class name - such an object exists, but the capacity is unset - such an object exists, but the capacity is zero
+         *
+         * The producer of these objects can decide which approach is more suitable.
+         *
+         * They are consumed by the kube-scheduler when a CSI driver opts into capacity-aware scheduling with CSIDriverSpec.StorageCapacity. The scheduler compares the MaximumVolumeSize against the requested size of pending volumes to filter out unsuitable nodes. If MaximumVolumeSize is unset, it falls back to a comparison against the less precise Capacity. If that is also unset, the scheduler assumes that capacity is insufficient and tries some other node.
+         */
+        export interface CSIStorageCapacity {
+            /**
+             * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+             */
+            apiVersion?: pulumi.Input<"storage.k8s.io/v1">;
+            /**
+             * Capacity is the value reported by the CSI driver in its GetCapacityResponse for a GetCapacityRequest with topology and parameters that match the previous fields.
+             *
+             * The semantic is currently (CSI spec 1.2) defined as: The available capacity, in bytes, of the storage that can be used to provision volumes. If not set, that information is currently unavailable.
+             */
+            capacity?: pulumi.Input<string>;
+            /**
+             * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+             */
+            kind?: pulumi.Input<"CSIStorageCapacity">;
+            /**
+             * MaximumVolumeSize is the value reported by the CSI driver in its GetCapacityResponse for a GetCapacityRequest with topology and parameters that match the previous fields.
+             *
+             * This is defined since CSI spec 1.4.0 as the largest size that may be used in a CreateVolumeRequest.capacity_range.required_bytes field to create a volume with the same parameters as those in GetCapacityRequest. The corresponding value in the Kubernetes API is ResourceRequirements.Requests in a volume claim.
+             */
+            maximumVolumeSize?: pulumi.Input<string>;
+            /**
+             * Standard object's metadata. The name has no particular meaning. It must be be a DNS subdomain (dots allowed, 253 characters). To ensure that there are no conflicts with other CSI drivers on the cluster, the recommendation is to use csisc-<uuid>, a generated name, or a reverse-domain name which ends with the unique CSI driver name.
+             *
+             * Objects are namespaced.
+             *
+             * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+             */
+            metadata?: pulumi.Input<inputs.meta.v1.ObjectMeta>;
+            /**
+             * NodeTopology defines which nodes have access to the storage for which capacity was reported. If not set, the storage is not accessible from any node in the cluster. If empty, the storage is accessible from all nodes. This field is immutable.
+             */
+            nodeTopology?: pulumi.Input<inputs.meta.v1.LabelSelector>;
+            /**
+             * The name of the StorageClass that the reported capacity applies to. It must meet the same requirements as the name of a StorageClass object (non-empty, DNS subdomain). If that object no longer exists, the CSIStorageCapacity object is obsolete and should be removed by its creator. This field is immutable.
+             */
+            storageClassName: pulumi.Input<string>;
         }
 
         /**
@@ -15867,56 +15762,6 @@ export namespace storage {
     }
 
     export namespace v1alpha1 {
-        /**
-         * CSIStorageCapacity stores the result of one CSI GetCapacity call. For a given StorageClass, this describes the available capacity in a particular topology segment.  This can be used when considering where to instantiate new PersistentVolumes.
-         *
-         * For example this can express things like: - StorageClass "standard" has "1234 GiB" available in "topology.kubernetes.io/zone=us-east1" - StorageClass "localssd" has "10 GiB" available in "kubernetes.io/hostname=knode-abc123"
-         *
-         * The following three cases all imply that no capacity is available for a certain combination: - no object exists with suitable topology and storage class name - such an object exists, but the capacity is unset - such an object exists, but the capacity is zero
-         *
-         * The producer of these objects can decide which approach is more suitable.
-         *
-         * They are consumed by the kube-scheduler if the CSIStorageCapacity beta feature gate is enabled there and a CSI driver opts into capacity-aware scheduling with CSIDriver.StorageCapacity.
-         */
-        export interface CSIStorageCapacity {
-            /**
-             * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
-             */
-            apiVersion?: pulumi.Input<"storage.k8s.io/v1alpha1">;
-            /**
-             * Capacity is the value reported by the CSI driver in its GetCapacityResponse for a GetCapacityRequest with topology and parameters that match the previous fields.
-             *
-             * The semantic is currently (CSI spec 1.2) defined as: The available capacity, in bytes, of the storage that can be used to provision volumes. If not set, that information is currently unavailable and treated like zero capacity.
-             */
-            capacity?: pulumi.Input<string>;
-            /**
-             * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-             */
-            kind?: pulumi.Input<"CSIStorageCapacity">;
-            /**
-             * MaximumVolumeSize is the value reported by the CSI driver in its GetCapacityResponse for a GetCapacityRequest with topology and parameters that match the previous fields.
-             *
-             * This is defined since CSI spec 1.4.0 as the largest size that may be used in a CreateVolumeRequest.capacity_range.required_bytes field to create a volume with the same parameters as those in GetCapacityRequest. The corresponding value in the Kubernetes API is ResourceRequirements.Requests in a volume claim.
-             */
-            maximumVolumeSize?: pulumi.Input<string>;
-            /**
-             * Standard object's metadata. The name has no particular meaning. It must be be a DNS subdomain (dots allowed, 253 characters). To ensure that there are no conflicts with other CSI drivers on the cluster, the recommendation is to use csisc-<uuid>, a generated name, or a reverse-domain name which ends with the unique CSI driver name.
-             *
-             * Objects are namespaced.
-             *
-             * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
-             */
-            metadata?: pulumi.Input<inputs.meta.v1.ObjectMeta>;
-            /**
-             * NodeTopology defines which nodes have access to the storage for which capacity was reported. If not set, the storage is not accessible from any node in the cluster. If empty, the storage is accessible from all nodes. This field is immutable.
-             */
-            nodeTopology?: pulumi.Input<inputs.meta.v1.LabelSelector>;
-            /**
-             * The name of the StorageClass that the reported capacity applies to. It must meet the same requirements as the name of a StorageClass object (non-empty, DNS subdomain). If that object no longer exists, the CSIStorageCapacity object is obsolete and should be removed by its creator. This field is immutable.
-             */
-            storageClassName: pulumi.Input<string>;
-        }
-
         /**
          * VolumeAttachment captures the intent to attach or detach the specified volume to/from the specified node.
          *
@@ -16157,7 +16002,7 @@ export namespace storage {
          *
          * The producer of these objects can decide which approach is more suitable.
          *
-         * They are consumed by the kube-scheduler if the CSIStorageCapacity beta feature gate is enabled there and a CSI driver opts into capacity-aware scheduling with CSIDriver.StorageCapacity.
+         * They are consumed by the kube-scheduler when a CSI driver opts into capacity-aware scheduling with CSIDriverSpec.StorageCapacity. The scheduler compares the MaximumVolumeSize against the requested size of pending volumes to filter out unsuitable nodes. If MaximumVolumeSize is unset, it falls back to a comparison against the less precise Capacity. If that is also unset, the scheduler assumes that capacity is insufficient and tries some other node.
          */
         export interface CSIStorageCapacity {
             /**
@@ -16167,7 +16012,7 @@ export namespace storage {
             /**
              * Capacity is the value reported by the CSI driver in its GetCapacityResponse for a GetCapacityRequest with topology and parameters that match the previous fields.
              *
-             * The semantic is currently (CSI spec 1.2) defined as: The available capacity, in bytes, of the storage that can be used to provision volumes. If not set, that information is currently unavailable and treated like zero capacity.
+             * The semantic is currently (CSI spec 1.2) defined as: The available capacity, in bytes, of the storage that can be used to provision volumes. If not set, that information is currently unavailable.
              */
             capacity?: pulumi.Input<string>;
             /**

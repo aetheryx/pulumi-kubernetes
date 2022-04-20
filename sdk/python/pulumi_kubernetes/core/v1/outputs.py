@@ -1803,11 +1803,6 @@ class Container(dict):
         :param Sequence['EnvFromSourceArgs'] env_from: List of sources to populate environment variables in the container. The keys defined within a source must be a C_IDENTIFIER. All invalid keys will be reported as an event when the container is starting. When a key exists in multiple sources, the value associated with the last source will take precedence. Values defined by an Env with a duplicate key will take precedence. Cannot be updated.
         :param str image: Container image name. More info: https://kubernetes.io/docs/concepts/containers/images This field is optional to allow higher level config management to default or override container images in workload controllers like Deployments and StatefulSets.
         :param str image_pull_policy: Image pull policy. One of Always, Never, IfNotPresent. Defaults to Always if :latest tag is specified, or IfNotPresent otherwise. Cannot be updated. More info: https://kubernetes.io/docs/concepts/containers/images#updating-images
-               
-               Possible enum values:
-                - `"Always"` means that kubelet always attempts to pull the latest image. Container will fail If the pull fails.
-                - `"IfNotPresent"` means that kubelet pulls if the image isn't present on disk. Container will fail if the image isn't present and the pull fails.
-                - `"Never"` means that kubelet never pulls an image, but only uses a local image. Container will fail if the image isn't present
         :param 'LifecycleArgs' lifecycle: Actions that the management system should take in response to container lifecycle events. Cannot be updated.
         :param 'ProbeArgs' liveness_probe: Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
         :param Sequence['ContainerPortArgs'] ports: List of ports to expose from the container. Exposing a port here gives the system additional information about the network connections a container uses, but is primarily informational. Not specifying a port here DOES NOT prevent that port from being exposed. Any port which is listening on the default "0.0.0.0" address inside a container will be accessible from the network. Cannot be updated.
@@ -1819,10 +1814,6 @@ class Container(dict):
         :param bool stdin_once: Whether the container runtime should close the stdin channel after it has been opened by a single attach. When stdin is true the stdin stream will remain open across multiple attach sessions. If stdinOnce is set to true, stdin is opened on container start, is empty until the first client attaches to stdin, and then remains open and accepts data until the client disconnects, at which time stdin is closed and remains closed until the container is restarted. If this flag is false, a container processes that reads from stdin will never receive an EOF. Default is false
         :param str termination_message_path: Optional: Path at which the file to which the container's termination message will be written is mounted into the container's filesystem. Message written is intended to be brief final status, such as an assertion failure message. Will be truncated by the node if greater than 4096 bytes. The total message length across all containers will be limited to 12kb. Defaults to /dev/termination-log. Cannot be updated.
         :param str termination_message_policy: Indicate how the termination message should be populated. File will use the contents of terminationMessagePath to populate the container status message on both success and failure. FallbackToLogsOnError will use the last chunk of container log output if the termination message file is empty and the container exited with an error. The log output is limited to 2048 bytes or 80 lines, whichever is smaller. Defaults to File. Cannot be updated.
-               
-               Possible enum values:
-                - `"FallbackToLogsOnError"` will read the most recent contents of the container logs for the container status message when the container exits with an error and the terminationMessagePath has no contents.
-                - `"File"` is the default behavior and will set the container status message to the contents of the container's terminationMessagePath when the container exits.
         :param bool tty: Whether this container should allocate a TTY for itself, also requires 'stdin' to be true. Default is false.
         :param Sequence['VolumeDeviceArgs'] volume_devices: volumeDevices is the list of block devices to be used by the container.
         :param Sequence['VolumeMountArgs'] volume_mounts: Pod volumes to mount into the container's filesystem. Cannot be updated.
@@ -1925,11 +1916,6 @@ class Container(dict):
     def image_pull_policy(self) -> Optional[str]:
         """
         Image pull policy. One of Always, Never, IfNotPresent. Defaults to Always if :latest tag is specified, or IfNotPresent otherwise. Cannot be updated. More info: https://kubernetes.io/docs/concepts/containers/images#updating-images
-
-        Possible enum values:
-         - `"Always"` means that kubelet always attempts to pull the latest image. Container will fail If the pull fails.
-         - `"IfNotPresent"` means that kubelet pulls if the image isn't present on disk. Container will fail if the image isn't present and the pull fails.
-         - `"Never"` means that kubelet never pulls an image, but only uses a local image. Container will fail if the image isn't present
         """
         return pulumi.get(self, "image_pull_policy")
 
@@ -2018,10 +2004,6 @@ class Container(dict):
     def termination_message_policy(self) -> Optional[str]:
         """
         Indicate how the termination message should be populated. File will use the contents of terminationMessagePath to populate the container status message on both success and failure. FallbackToLogsOnError will use the last chunk of container log output if the termination message file is empty and the container exited with an error. The log output is limited to 2048 bytes or 80 lines, whichever is smaller. Defaults to File. Cannot be updated.
-
-        Possible enum values:
-         - `"FallbackToLogsOnError"` will read the most recent contents of the container logs for the container status message when the container exits with an error and the terminationMessagePath has no contents.
-         - `"File"` is the default behavior and will set the container status message to the contents of the container's terminationMessagePath when the container exits.
         """
         return pulumi.get(self, "termination_message_policy")
 
@@ -2148,11 +2130,6 @@ class ContainerPort(dict):
         :param int host_port: Number of port to expose on the host. If specified, this must be a valid port number, 0 < x < 65536. If HostNetwork is specified, this must match ContainerPort. Most containers do not need this.
         :param str name: If specified, this must be an IANA_SVC_NAME and unique within the pod. Each named port in a pod must have a unique name. Name for the port that can be referred to by services.
         :param str protocol: Protocol for port. Must be UDP, TCP, or SCTP. Defaults to "TCP".
-               
-               Possible enum values:
-                - `"SCTP"` is the SCTP protocol.
-                - `"TCP"` is the TCP protocol.
-                - `"UDP"` is the UDP protocol.
         """
         pulumi.set(__self__, "container_port", container_port)
         if host_ip is not None:
@@ -2201,11 +2178,6 @@ class ContainerPort(dict):
     def protocol(self) -> Optional[str]:
         """
         Protocol for port. Must be UDP, TCP, or SCTP. Defaults to "TCP".
-
-        Possible enum values:
-         - `"SCTP"` is the SCTP protocol.
-         - `"TCP"` is the TCP protocol.
-         - `"UDP"` is the UDP protocol.
         """
         return pulumi.get(self, "protocol")
 
@@ -2939,11 +2911,6 @@ class EndpointPort(dict):
         :param str app_protocol: The application protocol for this port. This field follows standard Kubernetes label syntax. Un-prefixed names are reserved for IANA standard service names (as per RFC-6335 and https://www.iana.org/assignments/service-names). Non-standard protocols should use prefixed names such as mycompany.com/my-custom-protocol.
         :param str name: The name of this port.  This must match the 'name' field in the corresponding ServicePort. Must be a DNS_LABEL. Optional only if one port is defined.
         :param str protocol: The IP protocol for this port. Must be UDP, TCP, or SCTP. Default is TCP.
-               
-               Possible enum values:
-                - `"SCTP"` is the SCTP protocol.
-                - `"TCP"` is the TCP protocol.
-                - `"UDP"` is the UDP protocol.
         """
         pulumi.set(__self__, "port", port)
         if app_protocol is not None:
@@ -2982,11 +2949,6 @@ class EndpointPort(dict):
     def protocol(self) -> Optional[str]:
         """
         The IP protocol for this port. Must be UDP, TCP, or SCTP. Default is TCP.
-
-        Possible enum values:
-         - `"SCTP"` is the SCTP protocol.
-         - `"TCP"` is the TCP protocol.
-         - `"UDP"` is the UDP protocol.
         """
         return pulumi.get(self, "protocol")
 
@@ -3465,11 +3427,6 @@ class EphemeralContainer(dict):
         :param Sequence['EnvFromSourceArgs'] env_from: List of sources to populate environment variables in the container. The keys defined within a source must be a C_IDENTIFIER. All invalid keys will be reported as an event when the container is starting. When a key exists in multiple sources, the value associated with the last source will take precedence. Values defined by an Env with a duplicate key will take precedence. Cannot be updated.
         :param str image: Container image name. More info: https://kubernetes.io/docs/concepts/containers/images
         :param str image_pull_policy: Image pull policy. One of Always, Never, IfNotPresent. Defaults to Always if :latest tag is specified, or IfNotPresent otherwise. Cannot be updated. More info: https://kubernetes.io/docs/concepts/containers/images#updating-images
-               
-               Possible enum values:
-                - `"Always"` means that kubelet always attempts to pull the latest image. Container will fail If the pull fails.
-                - `"IfNotPresent"` means that kubelet pulls if the image isn't present on disk. Container will fail if the image isn't present and the pull fails.
-                - `"Never"` means that kubelet never pulls an image, but only uses a local image. Container will fail if the image isn't present
         :param 'LifecycleArgs' lifecycle: Lifecycle is not allowed for ephemeral containers.
         :param 'ProbeArgs' liveness_probe: Probes are not allowed for ephemeral containers.
         :param Sequence['ContainerPortArgs'] ports: Ports are not allowed for ephemeral containers.
@@ -3484,10 +3441,6 @@ class EphemeralContainer(dict):
                The container runtime must implement support for this feature. If the runtime does not support namespace targeting then the result of setting this field is undefined.
         :param str termination_message_path: Optional: Path at which the file to which the container's termination message will be written is mounted into the container's filesystem. Message written is intended to be brief final status, such as an assertion failure message. Will be truncated by the node if greater than 4096 bytes. The total message length across all containers will be limited to 12kb. Defaults to /dev/termination-log. Cannot be updated.
         :param str termination_message_policy: Indicate how the termination message should be populated. File will use the contents of terminationMessagePath to populate the container status message on both success and failure. FallbackToLogsOnError will use the last chunk of container log output if the termination message file is empty and the container exited with an error. The log output is limited to 2048 bytes or 80 lines, whichever is smaller. Defaults to File. Cannot be updated.
-               
-               Possible enum values:
-                - `"FallbackToLogsOnError"` will read the most recent contents of the container logs for the container status message when the container exits with an error and the terminationMessagePath has no contents.
-                - `"File"` is the default behavior and will set the container status message to the contents of the container's terminationMessagePath when the container exits.
         :param bool tty: Whether this container should allocate a TTY for itself, also requires 'stdin' to be true. Default is false.
         :param Sequence['VolumeDeviceArgs'] volume_devices: volumeDevices is the list of block devices to be used by the container.
         :param Sequence['VolumeMountArgs'] volume_mounts: Pod volumes to mount into the container's filesystem. Subpath mounts are not allowed for ephemeral containers. Cannot be updated.
@@ -3592,11 +3545,6 @@ class EphemeralContainer(dict):
     def image_pull_policy(self) -> Optional[str]:
         """
         Image pull policy. One of Always, Never, IfNotPresent. Defaults to Always if :latest tag is specified, or IfNotPresent otherwise. Cannot be updated. More info: https://kubernetes.io/docs/concepts/containers/images#updating-images
-
-        Possible enum values:
-         - `"Always"` means that kubelet always attempts to pull the latest image. Container will fail If the pull fails.
-         - `"IfNotPresent"` means that kubelet pulls if the image isn't present on disk. Container will fail if the image isn't present and the pull fails.
-         - `"Never"` means that kubelet never pulls an image, but only uses a local image. Container will fail if the image isn't present
         """
         return pulumi.get(self, "image_pull_policy")
 
@@ -3695,10 +3643,6 @@ class EphemeralContainer(dict):
     def termination_message_policy(self) -> Optional[str]:
         """
         Indicate how the termination message should be populated. File will use the contents of terminationMessagePath to populate the container status message on both success and failure. FallbackToLogsOnError will use the last chunk of container log output if the termination message file is empty and the container exited with an error. The log output is limited to 2048 bytes or 80 lines, whichever is smaller. Defaults to File. Cannot be updated.
-
-        Possible enum values:
-         - `"FallbackToLogsOnError"` will read the most recent contents of the container logs for the container status message when the container exits with an error and the terminationMessagePath has no contents.
-         - `"File"` is the default behavior and will set the container status message to the contents of the container's terminationMessagePath when the container exits.
         """
         return pulumi.get(self, "termination_message_policy")
 
@@ -4833,10 +4777,6 @@ class HTTPGetAction(dict):
         :param Sequence['HTTPHeaderArgs'] http_headers: Custom headers to set in the request. HTTP allows repeated headers.
         :param str path: Path to access on the HTTP server.
         :param str scheme: Scheme to use for connecting to the host. Defaults to HTTP.
-               
-               Possible enum values:
-                - `"HTTP"` means that the scheme used will be http://
-                - `"HTTPS"` means that the scheme used will be https://
         """
         pulumi.set(__self__, "port", port)
         if host is not None:
@@ -4885,10 +4825,6 @@ class HTTPGetAction(dict):
     def scheme(self) -> Optional[str]:
         """
         Scheme to use for connecting to the host. Defaults to HTTP.
-
-        Possible enum values:
-         - `"HTTP"` means that the scheme used will be http://
-         - `"HTTPS"` means that the scheme used will be https://
         """
         return pulumi.get(self, "scheme")
 
@@ -6106,10 +6042,6 @@ class NamespaceStatus(dict):
         NamespaceStatus is information about the current status of a Namespace.
         :param Sequence['NamespaceConditionArgs'] conditions: Represents the latest available observations of a namespace's current state.
         :param str phase: Phase is the current lifecycle phase of the namespace. More info: https://kubernetes.io/docs/tasks/administer-cluster/namespaces/
-               
-               Possible enum values:
-                - `"Active"` means the namespace is available for use in the system
-                - `"Terminating"` means the namespace is undergoing graceful termination
         """
         if conditions is not None:
             pulumi.set(__self__, "conditions", conditions)
@@ -6129,10 +6061,6 @@ class NamespaceStatus(dict):
     def phase(self) -> Optional[str]:
         """
         Phase is the current lifecycle phase of the namespace. More info: https://kubernetes.io/docs/tasks/administer-cluster/namespaces/
-
-        Possible enum values:
-         - `"Active"` means the namespace is available for use in the system
-         - `"Terminating"` means the namespace is undergoing graceful termination
         """
         return pulumi.get(self, "phase")
 
@@ -6620,14 +6548,6 @@ class NodeSelectorRequirement(dict):
         A node selector requirement is a selector that contains values, a key, and an operator that relates the key and values.
         :param str key: The label key that the selector applies to.
         :param str operator: Represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
-               
-               Possible enum values:
-                - `"DoesNotExist"`
-                - `"Exists"`
-                - `"Gt"`
-                - `"In"`
-                - `"Lt"`
-                - `"NotIn"`
         :param Sequence[str] values: An array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. If the operator is Gt or Lt, the values array must have a single element, which will be interpreted as an integer. This array is replaced during a strategic merge patch.
         """
         pulumi.set(__self__, "key", key)
@@ -6648,14 +6568,6 @@ class NodeSelectorRequirement(dict):
     def operator(self) -> str:
         """
         Represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
-
-        Possible enum values:
-         - `"DoesNotExist"`
-         - `"Exists"`
-         - `"Gt"`
-         - `"In"`
-         - `"Lt"`
-         - `"NotIn"`
         """
         return pulumi.get(self, "operator")
 
@@ -6893,11 +6805,6 @@ class NodeStatus(dict):
         :param Sequence['ContainerImageArgs'] images: List of container images on this node
         :param 'NodeSystemInfoArgs' node_info: Set of ids/uuids to uniquely identify the node. More info: https://kubernetes.io/docs/concepts/nodes/node/#info
         :param str phase: NodePhase is the recently observed lifecycle phase of the node. More info: https://kubernetes.io/docs/concepts/nodes/node/#phase The field is never populated, and now is deprecated.
-               
-               Possible enum values:
-                - `"Pending"` means the node has been created/added by the system, but not configured.
-                - `"Running"` means the node has been configured and has Kubernetes components running.
-                - `"Terminated"` means the node has been removed from the cluster.
         :param Sequence['AttachedVolumeArgs'] volumes_attached: List of volumes that are attached to the node.
         :param Sequence[str] volumes_in_use: List of attachable volumes in use (mounted) by the node.
         """
@@ -6993,11 +6900,6 @@ class NodeStatus(dict):
     def phase(self) -> Optional[str]:
         """
         NodePhase is the recently observed lifecycle phase of the node. More info: https://kubernetes.io/docs/concepts/nodes/node/#phase The field is never populated, and now is deprecated.
-
-        Possible enum values:
-         - `"Pending"` means the node has been created/added by the system, but not configured.
-         - `"Running"` means the node has been configured and has Kubernetes components running.
-         - `"Terminated"` means the node has been removed from the cluster.
         """
         return pulumi.get(self, "phase")
 
@@ -7071,7 +6973,7 @@ class NodeSystemInfo(dict):
         NodeSystemInfo is a set of ids/uuids to uniquely identify the node.
         :param str architecture: The Architecture reported by the node
         :param str boot_id: Boot ID reported by the node.
-        :param str container_runtime_version: ContainerRuntime Version reported by the node through runtime remote API (e.g. docker://1.5.0).
+        :param str container_runtime_version: ContainerRuntime Version reported by the node through runtime remote API (e.g. containerd://1.4.2).
         :param str kernel_version: Kernel Version reported by the node from 'uname -r' (e.g. 3.16.0-0.bpo.4-amd64).
         :param str kube_proxy_version: KubeProxy Version reported by the node.
         :param str kubelet_version: Kubelet Version reported by the node.
@@ -7111,7 +7013,7 @@ class NodeSystemInfo(dict):
     @pulumi.getter(name="containerRuntimeVersion")
     def container_runtime_version(self) -> str:
         """
-        ContainerRuntime Version reported by the node through runtime remote API (e.g. docker://1.5.0).
+        ContainerRuntime Version reported by the node through runtime remote API (e.g. containerd://1.4.2).
         """
         return pulumi.get(self, "container_runtime_version")
 
@@ -7659,7 +7561,7 @@ class PersistentVolumeClaimSpec(dict):
                * While DataSource ignores disallowed values (dropping them), DataSourceRef
                  preserves all values, and generates an error if a disallowed value is
                  specified.
-               (Alpha) Using this field requires the AnyVolumeDataSource feature gate to be enabled.
+               (Beta) Using this field requires the AnyVolumeDataSource feature gate to be enabled.
         :param 'ResourceRequirementsArgs' resources: resources represents the minimum resources the volume should have. If RecoverVolumeExpansionFailure feature is enabled users are allowed to specify resource requirements that are lower than previous value but must still be higher than capacity recorded in the status field of the claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources
         :param '_meta.v1.LabelSelectorArgs' selector: selector is a label query over volumes to consider for binding.
         :param str storage_class_name: storageClassName is the name of the StorageClass required by the claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1
@@ -7708,7 +7610,7 @@ class PersistentVolumeClaimSpec(dict):
         * While DataSource ignores disallowed values (dropping them), DataSourceRef
           preserves all values, and generates an error if a disallowed value is
           specified.
-        (Alpha) Using this field requires the AnyVolumeDataSource feature gate to be enabled.
+        (Beta) Using this field requires the AnyVolumeDataSource feature gate to be enabled.
         """
         return pulumi.get(self, "data_source_ref")
 
@@ -7793,11 +7695,6 @@ class PersistentVolumeClaimStatus(dict):
         :param Mapping[str, str] capacity: capacity represents the actual resources of the underlying volume.
         :param Sequence['PersistentVolumeClaimConditionArgs'] conditions: conditions is the current Condition of persistent volume claim. If underlying persistent volume is being resized then the Condition will be set to 'ResizeStarted'.
         :param str phase: phase represents the current phase of PersistentVolumeClaim.
-               
-               Possible enum values:
-                - `"Bound"` used for PersistentVolumeClaims that are bound
-                - `"Lost"` used for PersistentVolumeClaims that lost their underlying PersistentVolume. The claim was bound to a PersistentVolume and this volume does not exist any longer and all data on it was lost.
-                - `"Pending"` used for PersistentVolumeClaims that are not yet bound
         :param str resize_status: resizeStatus stores status of resize operation. ResizeStatus is not set by default but when expansion is complete resizeStatus is set to empty string by resize controller or kubelet. This is an alpha field and requires enabling RecoverVolumeExpansionFailure feature.
         """
         if access_modes is not None:
@@ -7850,11 +7747,6 @@ class PersistentVolumeClaimStatus(dict):
     def phase(self) -> Optional[str]:
         """
         phase represents the current phase of PersistentVolumeClaim.
-
-        Possible enum values:
-         - `"Bound"` used for PersistentVolumeClaims that are bound
-         - `"Lost"` used for PersistentVolumeClaims that lost their underlying PersistentVolume. The claim was bound to a PersistentVolume and this volume does not exist any longer and all data on it was lost.
-         - `"Pending"` used for PersistentVolumeClaims that are not yet bound
         """
         return pulumi.get(self, "phase")
 
@@ -8062,11 +7954,6 @@ class PersistentVolumeSpec(dict):
         :param 'NFSVolumeSourceArgs' nfs: nfs represents an NFS mount on the host. Provisioned by an admin. More info: https://kubernetes.io/docs/concepts/storage/volumes#nfs
         :param 'VolumeNodeAffinityArgs' node_affinity: nodeAffinity defines constraints that limit what nodes this volume can be accessed from. This field influences the scheduling of pods that use this volume.
         :param str persistent_volume_reclaim_policy: persistentVolumeReclaimPolicy defines what happens to a persistent volume when released from its claim. Valid options are Retain (default for manually created PersistentVolumes), Delete (default for dynamically provisioned PersistentVolumes), and Recycle (deprecated). Recycle must be supported by the volume plugin underlying this PersistentVolume. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#reclaiming
-               
-               Possible enum values:
-                - `"Delete"` means the volume will be deleted from Kubernetes on release from its claim. The volume plugin must support Deletion.
-                - `"Recycle"` means the volume will be recycled back into the pool of unbound persistent volumes on release from its claim. The volume plugin must support Recycling.
-                - `"Retain"` means the volume will be left in its current phase (Released) for manual reclamation by the administrator. The default policy is Retain.
         :param 'PhotonPersistentDiskVolumeSourceArgs' photon_persistent_disk: photonPersistentDisk represents a PhotonController persistent disk attached and mounted on kubelets host machine
         :param 'PortworxVolumeSourceArgs' portworx_volume: portworxVolume represents a portworx volume attached and mounted on kubelets host machine
         :param 'QuobyteVolumeSourceArgs' quobyte: quobyte represents a Quobyte mount on the host that shares a pod's lifetime
@@ -8303,11 +8190,6 @@ class PersistentVolumeSpec(dict):
     def persistent_volume_reclaim_policy(self) -> Optional[str]:
         """
         persistentVolumeReclaimPolicy defines what happens to a persistent volume when released from its claim. Valid options are Retain (default for manually created PersistentVolumes), Delete (default for dynamically provisioned PersistentVolumes), and Recycle (deprecated). Recycle must be supported by the volume plugin underlying this PersistentVolume. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#reclaiming
-
-        Possible enum values:
-         - `"Delete"` means the volume will be deleted from Kubernetes on release from its claim. The volume plugin must support Deletion.
-         - `"Recycle"` means the volume will be recycled back into the pool of unbound persistent volumes on release from its claim. The volume plugin must support Recycling.
-         - `"Retain"` means the volume will be left in its current phase (Released) for manual reclamation by the administrator. The default policy is Retain.
         """
         return pulumi.get(self, "persistent_volume_reclaim_policy")
 
@@ -8397,13 +8279,6 @@ class PersistentVolumeStatus(dict):
         PersistentVolumeStatus is the current status of a persistent volume.
         :param str message: message is a human-readable message indicating details about why the volume is in this state.
         :param str phase: phase indicates if a volume is available, bound to a claim, or released by a claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#phase
-               
-               Possible enum values:
-                - `"Available"` used for PersistentVolumes that are not yet bound Available volumes are held by the binder and matched to PersistentVolumeClaims
-                - `"Bound"` used for PersistentVolumes that are bound
-                - `"Failed"` used for PersistentVolumes that failed to be correctly recycled or deleted after being released from a claim
-                - `"Pending"` used for PersistentVolumes that are not available
-                - `"Released"` used for PersistentVolumes where the bound PersistentVolumeClaim was deleted released volumes must be recycled before becoming available again this phase is used by the persistent volume claim binder to signal to another process to reclaim the resource
         :param str reason: reason is a brief CamelCase string that describes any failure and is meant for machine parsing and tidy display in the CLI.
         """
         if message is not None:
@@ -8426,13 +8301,6 @@ class PersistentVolumeStatus(dict):
     def phase(self) -> Optional[str]:
         """
         phase indicates if a volume is available, bound to a claim, or released by a claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#phase
-
-        Possible enum values:
-         - `"Available"` used for PersistentVolumes that are not yet bound Available volumes are held by the binder and matched to PersistentVolumeClaims
-         - `"Bound"` used for PersistentVolumes that are bound
-         - `"Failed"` used for PersistentVolumes that failed to be correctly recycled or deleted after being released from a claim
-         - `"Pending"` used for PersistentVolumes that are not available
-         - `"Released"` used for PersistentVolumes where the bound PersistentVolumeClaim was deleted released volumes must be recycled before becoming available again this phase is used by the persistent volume claim binder to signal to another process to reclaim the resource
         """
         return pulumi.get(self, "phase")
 
@@ -9358,12 +9226,6 @@ class PodSpec(dict):
         :param bool automount_service_account_token: AutomountServiceAccountToken indicates whether a service account token should be automatically mounted.
         :param 'PodDNSConfigArgs' dns_config: Specifies the DNS parameters of a pod. Parameters specified here will be merged to the generated DNS configuration based on DNSPolicy.
         :param str dns_policy: Set DNS policy for the pod. Defaults to "ClusterFirst". Valid values are 'ClusterFirstWithHostNet', 'ClusterFirst', 'Default' or 'None'. DNS parameters given in DNSConfig will be merged with the policy selected with DNSPolicy. To have DNS options set along with hostNetwork, you have to specify DNS policy explicitly to 'ClusterFirstWithHostNet'.
-               
-               Possible enum values:
-                - `"ClusterFirst"` indicates that the pod should use cluster DNS first unless hostNetwork is true, if it is available, then fall back on the default (as determined by kubelet) DNS settings.
-                - `"ClusterFirstWithHostNet"` indicates that the pod should use cluster DNS first, if it is available, then fall back on the default (as determined by kubelet) DNS settings.
-                - `"Default"` indicates that the pod should use the default (as determined by kubelet) DNS settings.
-                - `"None"` indicates that the pod should use empty DNS settings. DNS parameters such as nameservers and search paths should be defined via DNSConfig.
         :param bool enable_service_links: EnableServiceLinks indicates whether information about services should be injected into pod's environment variables, matching the syntax of Docker links. Optional: Defaults to true.
         :param Sequence['EphemeralContainerArgs'] ephemeral_containers: List of ephemeral containers run in this pod. Ephemeral containers may be run in an existing pod to perform user-initiated actions such as debugging. This list cannot be specified when creating a pod, and it cannot be modified by updating the pod spec. In order to add an ephemeral container to an existing pod, use the pod's ephemeralcontainers subresource. This field is beta-level and available on clusters that haven't disabled the EphemeralContainers feature gate.
         :param Sequence['HostAliasArgs'] host_aliases: HostAliases is an optional list of hosts and IPs that will be injected into the pod's hosts file if specified. This is only valid for non-hostNetwork pods.
@@ -9371,7 +9233,7 @@ class PodSpec(dict):
         :param bool host_network: Host networking requested for this pod. Use the host's network namespace. If this option is set, the ports that will be used must be specified. Default to false.
         :param bool host_pid: Use the host's pid namespace. Optional: Default to false.
         :param str hostname: Specifies the hostname of the Pod If not specified, the pod's hostname will be set to a system-defined value.
-        :param Sequence['LocalObjectReferenceArgs'] image_pull_secrets: ImagePullSecrets is an optional list of references to secrets in the same namespace to use for pulling any of the images used by this PodSpec. If specified, these secrets will be passed to individual puller implementations for them to use. For example, in the case of docker, only DockerConfig type secrets are honored. More info: https://kubernetes.io/docs/concepts/containers/images#specifying-imagepullsecrets-on-a-pod
+        :param Sequence['LocalObjectReferenceArgs'] image_pull_secrets: ImagePullSecrets is an optional list of references to secrets in the same namespace to use for pulling any of the images used by this PodSpec. If specified, these secrets will be passed to individual puller implementations for them to use. More info: https://kubernetes.io/docs/concepts/containers/images#specifying-imagepullsecrets-on-a-pod
         :param Sequence['ContainerArgs'] init_containers: List of initialization containers belonging to the pod. Init containers are executed in order prior to containers being started. If any init container fails, the pod is considered to have failed and is handled according to its restartPolicy. The name for an init container or normal container must be unique among all containers. Init containers may not have Lifecycle actions, Readiness probes, Liveness probes, or Startup probes. The resourceRequirements of an init container are taken into account during scheduling by finding the highest request/limit for each resource type, and then using the max of of that value or the sum of the normal containers. Limits are applied to init containers in a similar fashion. Init containers cannot currently be added or removed. Cannot be updated. More info: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
         :param str node_name: NodeName is a request to schedule this pod onto a specific node. If it is non-empty, the scheduler simply schedules this pod onto that node, assuming that it fits resource requirements.
         :param Mapping[str, str] node_selector: NodeSelector is a selector which must be true for the pod to fit on a node. Selector which must match a node's labels for the pod to be scheduled on that node. More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
@@ -9379,18 +9241,13 @@ class PodSpec(dict):
                
                If the OS field is set to linux, the following fields must be unset: -securityContext.windowsOptions
                
-               If the OS field is set to windows, following fields must be unset: - spec.hostPID - spec.hostIPC - spec.securityContext.seLinuxOptions - spec.securityContext.seccompProfile - spec.securityContext.fsGroup - spec.securityContext.fsGroupChangePolicy - spec.securityContext.sysctls - spec.shareProcessNamespace - spec.securityContext.runAsUser - spec.securityContext.runAsGroup - spec.securityContext.supplementalGroups - spec.containers[*].securityContext.seLinuxOptions - spec.containers[*].securityContext.seccompProfile - spec.containers[*].securityContext.capabilities - spec.containers[*].securityContext.readOnlyRootFilesystem - spec.containers[*].securityContext.privileged - spec.containers[*].securityContext.allowPrivilegeEscalation - spec.containers[*].securityContext.procMount - spec.containers[*].securityContext.runAsUser - spec.containers[*].securityContext.runAsGroup This is an alpha field and requires the IdentifyPodOS feature
+               If the OS field is set to windows, following fields must be unset: - spec.hostPID - spec.hostIPC - spec.securityContext.seLinuxOptions - spec.securityContext.seccompProfile - spec.securityContext.fsGroup - spec.securityContext.fsGroupChangePolicy - spec.securityContext.sysctls - spec.shareProcessNamespace - spec.securityContext.runAsUser - spec.securityContext.runAsGroup - spec.securityContext.supplementalGroups - spec.containers[*].securityContext.seLinuxOptions - spec.containers[*].securityContext.seccompProfile - spec.containers[*].securityContext.capabilities - spec.containers[*].securityContext.readOnlyRootFilesystem - spec.containers[*].securityContext.privileged - spec.containers[*].securityContext.allowPrivilegeEscalation - spec.containers[*].securityContext.procMount - spec.containers[*].securityContext.runAsUser - spec.containers[*].securityContext.runAsGroup This is a beta field and requires the IdentifyPodOS feature
         :param Mapping[str, str] overhead: Overhead represents the resource overhead associated with running a pod for a given RuntimeClass. This field will be autopopulated at admission time by the RuntimeClass admission controller. If the RuntimeClass admission controller is enabled, overhead must not be set in Pod create requests. The RuntimeClass admission controller will reject Pod create requests which have the overhead already set. If RuntimeClass is configured and selected in the PodSpec, Overhead will be set to the value defined in the corresponding RuntimeClass, otherwise it will remain unset and treated as zero. More info: https://git.k8s.io/enhancements/keps/sig-node/688-pod-overhead/README.md
         :param str preemption_policy: PreemptionPolicy is the Policy for preempting pods with lower priority. One of Never, PreemptLowerPriority. Defaults to PreemptLowerPriority if unset.
         :param int priority: The priority value. Various system components use this field to find the priority of the pod. When Priority Admission Controller is enabled, it prevents users from setting this field. The admission controller populates this field from PriorityClassName. The higher the value, the higher the priority.
         :param str priority_class_name: If specified, indicates the pod's priority. "system-node-critical" and "system-cluster-critical" are two special keywords which indicate the highest priorities with the former being the highest priority. Any other name must be defined by creating a PriorityClass object with that name. If not specified, the pod priority will be default or zero if there is no default.
         :param Sequence['PodReadinessGateArgs'] readiness_gates: If specified, all readiness gates will be evaluated for pod readiness. A pod is ready when all its containers are ready AND all conditions specified in the readiness gates have status equal to "True" More info: https://git.k8s.io/enhancements/keps/sig-network/580-pod-readiness-gates
         :param str restart_policy: Restart policy for all containers within the pod. One of Always, OnFailure, Never. Default to Always. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#restart-policy
-               
-               Possible enum values:
-                - `"Always"`
-                - `"Never"`
-                - `"OnFailure"`
         :param str runtime_class_name: RuntimeClassName refers to a RuntimeClass object in the node.k8s.io group, which should be used to run this pod.  If no RuntimeClass resource matches the named class, the pod will not be run. If unset or empty, the "legacy" RuntimeClass will be used, which is an implicit class with an empty definition that uses the default runtime handler. More info: https://git.k8s.io/enhancements/keps/sig-node/585-runtime-class
         :param str scheduler_name: If specified, the pod will be dispatched by specified scheduler. If not specified, the pod will be dispatched by default scheduler.
         :param 'PodSecurityContextArgs' security_context: SecurityContext holds pod-level security attributes and common container settings. Optional: Defaults to empty.  See type description for default values of each field.
@@ -9521,12 +9378,6 @@ class PodSpec(dict):
     def dns_policy(self) -> Optional[str]:
         """
         Set DNS policy for the pod. Defaults to "ClusterFirst". Valid values are 'ClusterFirstWithHostNet', 'ClusterFirst', 'Default' or 'None'. DNS parameters given in DNSConfig will be merged with the policy selected with DNSPolicy. To have DNS options set along with hostNetwork, you have to specify DNS policy explicitly to 'ClusterFirstWithHostNet'.
-
-        Possible enum values:
-         - `"ClusterFirst"` indicates that the pod should use cluster DNS first unless hostNetwork is true, if it is available, then fall back on the default (as determined by kubelet) DNS settings.
-         - `"ClusterFirstWithHostNet"` indicates that the pod should use cluster DNS first, if it is available, then fall back on the default (as determined by kubelet) DNS settings.
-         - `"Default"` indicates that the pod should use the default (as determined by kubelet) DNS settings.
-         - `"None"` indicates that the pod should use empty DNS settings. DNS parameters such as nameservers and search paths should be defined via DNSConfig.
         """
         return pulumi.get(self, "dns_policy")
 
@@ -9590,7 +9441,7 @@ class PodSpec(dict):
     @pulumi.getter(name="imagePullSecrets")
     def image_pull_secrets(self) -> Optional[Sequence['outputs.LocalObjectReference']]:
         """
-        ImagePullSecrets is an optional list of references to secrets in the same namespace to use for pulling any of the images used by this PodSpec. If specified, these secrets will be passed to individual puller implementations for them to use. For example, in the case of docker, only DockerConfig type secrets are honored. More info: https://kubernetes.io/docs/concepts/containers/images#specifying-imagepullsecrets-on-a-pod
+        ImagePullSecrets is an optional list of references to secrets in the same namespace to use for pulling any of the images used by this PodSpec. If specified, these secrets will be passed to individual puller implementations for them to use. More info: https://kubernetes.io/docs/concepts/containers/images#specifying-imagepullsecrets-on-a-pod
         """
         return pulumi.get(self, "image_pull_secrets")
 
@@ -9626,7 +9477,7 @@ class PodSpec(dict):
 
         If the OS field is set to linux, the following fields must be unset: -securityContext.windowsOptions
 
-        If the OS field is set to windows, following fields must be unset: - spec.hostPID - spec.hostIPC - spec.securityContext.seLinuxOptions - spec.securityContext.seccompProfile - spec.securityContext.fsGroup - spec.securityContext.fsGroupChangePolicy - spec.securityContext.sysctls - spec.shareProcessNamespace - spec.securityContext.runAsUser - spec.securityContext.runAsGroup - spec.securityContext.supplementalGroups - spec.containers[*].securityContext.seLinuxOptions - spec.containers[*].securityContext.seccompProfile - spec.containers[*].securityContext.capabilities - spec.containers[*].securityContext.readOnlyRootFilesystem - spec.containers[*].securityContext.privileged - spec.containers[*].securityContext.allowPrivilegeEscalation - spec.containers[*].securityContext.procMount - spec.containers[*].securityContext.runAsUser - spec.containers[*].securityContext.runAsGroup This is an alpha field and requires the IdentifyPodOS feature
+        If the OS field is set to windows, following fields must be unset: - spec.hostPID - spec.hostIPC - spec.securityContext.seLinuxOptions - spec.securityContext.seccompProfile - spec.securityContext.fsGroup - spec.securityContext.fsGroupChangePolicy - spec.securityContext.sysctls - spec.shareProcessNamespace - spec.securityContext.runAsUser - spec.securityContext.runAsGroup - spec.securityContext.supplementalGroups - spec.containers[*].securityContext.seLinuxOptions - spec.containers[*].securityContext.seccompProfile - spec.containers[*].securityContext.capabilities - spec.containers[*].securityContext.readOnlyRootFilesystem - spec.containers[*].securityContext.privileged - spec.containers[*].securityContext.allowPrivilegeEscalation - spec.containers[*].securityContext.procMount - spec.containers[*].securityContext.runAsUser - spec.containers[*].securityContext.runAsGroup This is a beta field and requires the IdentifyPodOS feature
         """
         return pulumi.get(self, "os")
 
@@ -9675,11 +9526,6 @@ class PodSpec(dict):
     def restart_policy(self) -> Optional[str]:
         """
         Restart policy for all containers within the pod. One of Always, OnFailure, Never. Default to Always. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#restart-policy
-
-        Possible enum values:
-         - `"Always"`
-         - `"Never"`
-         - `"OnFailure"`
         """
         return pulumi.get(self, "restart_policy")
 
@@ -9846,21 +9692,9 @@ class PodStatus(dict):
                Pending: The pod has been accepted by the Kubernetes system, but one or more of the container images has not been created. This includes time before being scheduled as well as time spent downloading images over the network, which could take a while. Running: The pod has been bound to a node, and all of the containers have been created. At least one container is still running, or is in the process of starting or restarting. Succeeded: All containers in the pod have terminated in success, and will not be restarted. Failed: All containers in the pod have terminated, and at least one container has terminated in failure. The container either exited with non-zero status or was terminated by the system. Unknown: For some reason the state of the pod could not be obtained, typically due to an error in communicating with the host of the pod.
                
                More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-phase
-               
-               Possible enum values:
-                - `"Failed"` means that all containers in the pod have terminated, and at least one container has terminated in a failure (exited with a non-zero exit code or was stopped by the system).
-                - `"Pending"` means the pod has been accepted by the system, but one or more of the containers has not been started. This includes time before being bound to a node, as well as time spent pulling images onto the host.
-                - `"Running"` means the pod has been bound to a node and all of the containers have been started. At least one container is still running or is in the process of being restarted.
-                - `"Succeeded"` means that all containers in the pod have voluntarily terminated with a container exit code of 0, and the system is not going to restart any of these containers.
-                - `"Unknown"` means that for some reason the state of the pod could not be obtained, typically due to an error in communicating with the host of the pod. Deprecated: It isn't being set since 2015 (74da3b14b0c0f658b3bb8d2def5094686d0e9095)
         :param str pod_ip: IP address allocated to the pod. Routable at least within the cluster. Empty if not yet allocated.
         :param Sequence['PodIPArgs'] pod_ips: podIPs holds the IP addresses allocated to the pod. If this field is specified, the 0th entry must match the podIP field. Pods may be allocated at most 1 value for each of IPv4 and IPv6. This list is empty if no IPs have been allocated yet.
         :param str qos_class: The Quality of Service (QOS) classification assigned to the pod based on resource requirements See PodQOSClass type for available QOS classes More info: https://git.k8s.io/community/contributors/design-proposals/node/resource-qos.md
-               
-               Possible enum values:
-                - `"BestEffort"` is the BestEffort qos class.
-                - `"Burstable"` is the Burstable qos class.
-                - `"Guaranteed"` is the Guaranteed qos class.
         :param str reason: A brief CamelCase message indicating details about why the pod is in this state. e.g. 'Evicted'
         :param str start_time: RFC 3339 date and time at which the object was acknowledged by the Kubelet. This is before the Kubelet pulled the container image(s) for the pod.
         """
@@ -9956,13 +9790,6 @@ class PodStatus(dict):
         Pending: The pod has been accepted by the Kubernetes system, but one or more of the container images has not been created. This includes time before being scheduled as well as time spent downloading images over the network, which could take a while. Running: The pod has been bound to a node, and all of the containers have been created. At least one container is still running, or is in the process of starting or restarting. Succeeded: All containers in the pod have terminated in success, and will not be restarted. Failed: All containers in the pod have terminated, and at least one container has terminated in failure. The container either exited with non-zero status or was terminated by the system. Unknown: For some reason the state of the pod could not be obtained, typically due to an error in communicating with the host of the pod.
 
         More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-phase
-
-        Possible enum values:
-         - `"Failed"` means that all containers in the pod have terminated, and at least one container has terminated in a failure (exited with a non-zero exit code or was stopped by the system).
-         - `"Pending"` means the pod has been accepted by the system, but one or more of the containers has not been started. This includes time before being bound to a node, as well as time spent pulling images onto the host.
-         - `"Running"` means the pod has been bound to a node and all of the containers have been started. At least one container is still running or is in the process of being restarted.
-         - `"Succeeded"` means that all containers in the pod have voluntarily terminated with a container exit code of 0, and the system is not going to restart any of these containers.
-         - `"Unknown"` means that for some reason the state of the pod could not be obtained, typically due to an error in communicating with the host of the pod. Deprecated: It isn't being set since 2015 (74da3b14b0c0f658b3bb8d2def5094686d0e9095)
         """
         return pulumi.get(self, "phase")
 
@@ -9987,11 +9814,6 @@ class PodStatus(dict):
     def qos_class(self) -> Optional[str]:
         """
         The Quality of Service (QOS) classification assigned to the pod based on resource requirements See PodQOSClass type for available QOS classes More info: https://git.k8s.io/community/contributors/design-proposals/node/resource-qos.md
-
-        Possible enum values:
-         - `"BestEffort"` is the BestEffort qos class.
-         - `"Burstable"` is the Burstable qos class.
-         - `"Guaranteed"` is the Guaranteed qos class.
         """
         return pulumi.get(self, "qos_class")
 
@@ -10132,11 +9954,6 @@ class PortStatus(dict):
         """
         :param int port: Port is the port number of the service port of which status is recorded here
         :param str protocol: Protocol is the protocol of the service port of which status is recorded here The supported values are: "TCP", "UDP", "SCTP"
-               
-               Possible enum values:
-                - `"SCTP"` is the SCTP protocol.
-                - `"TCP"` is the TCP protocol.
-                - `"UDP"` is the UDP protocol.
         :param str error: Error is to record the problem with the service port The format of the error shall comply with the following rules: - built-in error values shall be specified in this file and those shall use
                  CamelCase names
                - cloud provider specific error values must have names that comply with the
@@ -10160,11 +9977,6 @@ class PortStatus(dict):
     def protocol(self) -> str:
         """
         Protocol is the protocol of the service port of which status is recorded here The supported values are: "TCP", "UDP", "SCTP"
-
-        Possible enum values:
-         - `"SCTP"` is the SCTP protocol.
-         - `"TCP"` is the TCP protocol.
-         - `"UDP"` is the UDP protocol.
         """
         return pulumi.get(self, "protocol")
 
@@ -10333,7 +10145,7 @@ class Probe(dict):
         Probe describes a health check to be performed against a container to determine whether it is alive or ready to receive traffic.
         :param 'ExecActionArgs' exec_: Exec specifies the action to take.
         :param int failure_threshold: Minimum consecutive failures for the probe to be considered failed after having succeeded. Defaults to 3. Minimum value is 1.
-        :param 'GRPCActionArgs' grpc: GRPC specifies an action involving a GRPC port. This is an alpha field and requires enabling GRPCContainerProbe feature gate.
+        :param 'GRPCActionArgs' grpc: GRPC specifies an action involving a GRPC port. This is a beta field and requires enabling GRPCContainerProbe feature gate.
         :param 'HTTPGetActionArgs' http_get: HTTPGet specifies the http request to perform.
         :param int initial_delay_seconds: Number of seconds after the container has started before liveness probes are initiated. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
         :param int period_seconds: How often (in seconds) to perform the probe. Default to 10 seconds. Minimum value is 1.
@@ -10383,7 +10195,7 @@ class Probe(dict):
     @pulumi.getter
     def grpc(self) -> Optional['outputs.GRPCAction']:
         """
-        GRPC specifies an action involving a GRPC port. This is an alpha field and requires enabling GRPCContainerProbe feature gate.
+        GRPC specifies an action involving a GRPC port. This is a beta field and requires enabling GRPCContainerProbe feature gate.
         """
         return pulumi.get(self, "grpc")
 
@@ -11931,21 +11743,7 @@ class ScopedResourceSelectorRequirement(dict):
         """
         A scoped-resource selector requirement is a selector that contains values, a scope name, and an operator that relates the scope name and values.
         :param str operator: Represents a scope's relationship to a set of values. Valid operators are In, NotIn, Exists, DoesNotExist.
-               
-               Possible enum values:
-                - `"DoesNotExist"`
-                - `"Exists"`
-                - `"In"`
-                - `"NotIn"`
         :param str scope_name: The name of the scope that the selector applies to.
-               
-               Possible enum values:
-                - `"BestEffort"` Match all pod objects that have best effort quality of service
-                - `"CrossNamespacePodAffinity"` Match all pod objects that have cross-namespace pod (anti)affinity mentioned.
-                - `"NotBestEffort"` Match all pod objects that do not have best effort quality of service
-                - `"NotTerminating"` Match all pod objects where spec.activeDeadlineSeconds is nil
-                - `"PriorityClass"` Match all pod objects that have priority class mentioned
-                - `"Terminating"` Match all pod objects where spec.activeDeadlineSeconds >=0
         :param Sequence[str] values: An array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.
         """
         pulumi.set(__self__, "operator", operator)
@@ -11958,12 +11756,6 @@ class ScopedResourceSelectorRequirement(dict):
     def operator(self) -> str:
         """
         Represents a scope's relationship to a set of values. Valid operators are In, NotIn, Exists, DoesNotExist.
-
-        Possible enum values:
-         - `"DoesNotExist"`
-         - `"Exists"`
-         - `"In"`
-         - `"NotIn"`
         """
         return pulumi.get(self, "operator")
 
@@ -11972,14 +11764,6 @@ class ScopedResourceSelectorRequirement(dict):
     def scope_name(self) -> str:
         """
         The name of the scope that the selector applies to.
-
-        Possible enum values:
-         - `"BestEffort"` Match all pod objects that have best effort quality of service
-         - `"CrossNamespacePodAffinity"` Match all pod objects that have cross-namespace pod (anti)affinity mentioned.
-         - `"NotBestEffort"` Match all pod objects that do not have best effort quality of service
-         - `"NotTerminating"` Match all pod objects where spec.activeDeadlineSeconds is nil
-         - `"PriorityClass"` Match all pod objects that have priority class mentioned
-         - `"Terminating"` Match all pod objects where spec.activeDeadlineSeconds >=0
         """
         return pulumi.get(self, "scope_name")
 
@@ -12022,11 +11806,6 @@ class SeccompProfile(dict):
         :param str type: type indicates which kind of seccomp profile will be applied. Valid options are:
                
                Localhost - a profile defined in a file on the node should be used. RuntimeDefault - the container runtime default profile should be used. Unconfined - no profile should be applied.
-               
-               Possible enum values:
-                - `"Localhost"` indicates a profile defined in a file on the node should be used. The file's location relative to <kubelet-root-dir>/seccomp.
-                - `"RuntimeDefault"` represents the default container runtime seccomp profile.
-                - `"Unconfined"` indicates no seccomp profile is applied (A.K.A. unconfined).
         :param str localhost_profile: localhostProfile indicates a profile defined in a file on the node should be used. The profile must be preconfigured on the node to work. Must be a descending path, relative to the kubelet's configured seccomp profile location. Must only be set if type is "Localhost".
         """
         pulumi.set(__self__, "type", type)
@@ -12040,11 +11819,6 @@ class SeccompProfile(dict):
         type indicates which kind of seccomp profile will be applied. Valid options are:
 
         Localhost - a profile defined in a file on the node should be used. RuntimeDefault - the container runtime default profile should be used. Unconfined - no profile should be applied.
-
-        Possible enum values:
-         - `"Localhost"` indicates a profile defined in a file on the node should be used. The file's location relative to <kubelet-root-dir>/seccomp.
-         - `"RuntimeDefault"` represents the default container runtime seccomp profile.
-         - `"Unconfined"` indicates no seccomp profile is applied (A.K.A. unconfined).
         """
         return pulumi.get(self, "type")
 
@@ -12965,11 +12739,6 @@ class ServicePort(dict):
         :param str name: The name of this port within the service. This must be a DNS_LABEL. All ports within a ServiceSpec must have unique names. When considering the endpoints for a Service, this must match the 'name' field in the EndpointPort. Optional if only one ServicePort is defined on this service.
         :param int node_port: The port on each node on which this service is exposed when type is NodePort or LoadBalancer.  Usually assigned by the system. If a value is specified, in-range, and not in use it will be used, otherwise the operation will fail.  If not specified, a port will be allocated if this Service requires one.  If this field is specified when creating a Service which does not need it, creation will fail. This field will be wiped when updating a Service to no longer need it (e.g. changing type from NodePort to ClusterIP). More info: https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport
         :param str protocol: The IP protocol for this port. Supports "TCP", "UDP", and "SCTP". Default is TCP.
-               
-               Possible enum values:
-                - `"SCTP"` is the SCTP protocol.
-                - `"TCP"` is the TCP protocol.
-                - `"UDP"` is the UDP protocol.
         :param Union[int, str] target_port: Number or name of the port to access on the pods targeted by the service. Number must be in the range 1 to 65535. Name must be an IANA_SVC_NAME. If this is a string, it will be looked up as a named port in the target Pod's container ports. If this is not specified, the value of the 'port' field is used (an identity map). This field is ignored for services with clusterIP=None, and should be omitted or set equal to the 'port' field. More info: https://kubernetes.io/docs/concepts/services-networking/service/#defining-a-service
         """
         pulumi.set(__self__, "port", port)
@@ -13021,11 +12790,6 @@ class ServicePort(dict):
     def protocol(self) -> Optional[str]:
         """
         The IP protocol for this port. Supports "TCP", "UDP", and "SCTP". Default is TCP.
-
-        Possible enum values:
-         - `"SCTP"` is the SCTP protocol.
-         - `"TCP"` is the TCP protocol.
-         - `"UDP"` is the UDP protocol.
         """
         return pulumi.get(self, "protocol")
 
@@ -13126,10 +12890,6 @@ class ServiceSpec(dict):
         :param Sequence[str] external_ips: externalIPs is a list of IP addresses for which nodes in the cluster will also accept traffic for this service.  These IPs are not managed by Kubernetes.  The user is responsible for ensuring that traffic arrives at a node with this IP.  A common example is external load-balancers that are not part of the Kubernetes system.
         :param str external_name: externalName is the external reference that discovery mechanisms will return as an alias for this service (e.g. a DNS CNAME record). No proxying will be involved.  Must be a lowercase RFC-1123 hostname (https://tools.ietf.org/html/rfc1123) and requires `type` to be "ExternalName".
         :param str external_traffic_policy: externalTrafficPolicy denotes if this Service desires to route external traffic to node-local or cluster-wide endpoints. "Local" preserves the client source IP and avoids a second hop for LoadBalancer and Nodeport type services, but risks potentially imbalanced traffic spreading. "Cluster" obscures the client source IP and may cause a second hop to another node, but should have good overall load-spreading.
-               
-               Possible enum values:
-                - `"Cluster"` specifies node-global (legacy) behavior.
-                - `"Local"` specifies node-local endpoints behavior.
         :param int health_check_node_port: healthCheckNodePort specifies the healthcheck nodePort for the service. This only applies when type is set to LoadBalancer and externalTrafficPolicy is set to Local. If a value is specified, is in-range, and is not in use, it will be used.  If not specified, a value will be automatically allocated.  External systems (e.g. load-balancers) can use this port to determine if a given node holds endpoints for this service or not.  If this field is specified when creating a Service which does not need it, creation will fail. This field will be wiped when updating a Service to no longer need it (e.g. changing type).
         :param str internal_traffic_policy: InternalTrafficPolicy specifies if the cluster internal traffic should be routed to all endpoints or node-local endpoints only. "Cluster" routes internal traffic to a Service to all endpoints. "Local" routes traffic to node-local endpoints only, traffic is dropped if no node-local endpoints are ready. The default value is "Cluster".
         :param Sequence[str] ip_families: IPFamilies is a list of IP families (e.g. IPv4, IPv6) assigned to this service. This field is usually assigned automatically based on cluster configuration and the ipFamilyPolicy field. If this field is specified manually, the requested family is available in the cluster, and ipFamilyPolicy allows it, it will be used; otherwise creation of the service will fail. This field is conditionally mutable: it allows for adding or removing a secondary IP family, but it does not allow changing the primary IP family of the Service. Valid values are "IPv4" and "IPv6".  This field only applies to Services of types ClusterIP, NodePort, and LoadBalancer, and does apply to "headless" services. This field will be wiped when updating a Service to type ExternalName.
@@ -13144,19 +12904,9 @@ class ServiceSpec(dict):
         :param bool publish_not_ready_addresses: publishNotReadyAddresses indicates that any agent which deals with endpoints for this Service should disregard any indications of ready/not-ready. The primary use case for setting this field is for a StatefulSet's Headless Service to propagate SRV DNS records for its Pods for the purpose of peer discovery. The Kubernetes controllers that generate Endpoints and EndpointSlice resources for Services interpret this to mean that all endpoints are considered "ready" even if the Pods themselves are not. Agents which consume only Kubernetes generated endpoints through the Endpoints or EndpointSlice resources can safely assume this behavior.
         :param Mapping[str, str] selector: Route service traffic to pods with label keys and values matching this selector. If empty or not present, the service is assumed to have an external process managing its endpoints, which Kubernetes will not modify. Only applies to types ClusterIP, NodePort, and LoadBalancer. Ignored if type is ExternalName. More info: https://kubernetes.io/docs/concepts/services-networking/service/
         :param str session_affinity: Supports "ClientIP" and "None". Used to maintain session affinity. Enable client IP based session affinity. Must be ClientIP or None. Defaults to None. More info: https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies
-               
-               Possible enum values:
-                - `"ClientIP"` is the Client IP based.
-                - `"None"` - no session affinity.
         :param 'SessionAffinityConfigArgs' session_affinity_config: sessionAffinityConfig contains the configurations of session affinity.
         :param Sequence[str] topology_keys: topologyKeys is a preference-order list of topology keys which implementations of services should use to preferentially sort endpoints when accessing this Service, it can not be used at the same time as externalTrafficPolicy=Local. Topology keys must be valid label keys and at most 16 keys may be specified. Endpoints are chosen based on the first topology key with available backends. If this field is specified and all entries have no backends that match the topology of the client, the service has no backends for that client and connections should fail. The special value "*" may be used to mean "any topology". This catch-all value, if used, only makes sense as the last value in the list. If this is not specified or empty, no topology constraints will be applied.
         :param Union[str, 'ServiceSpecType'] type: type determines how the Service is exposed. Defaults to ClusterIP. Valid options are ExternalName, ClusterIP, NodePort, and LoadBalancer. "ClusterIP" allocates a cluster-internal IP address for load-balancing to endpoints. Endpoints are determined by the selector or if that is not specified, by manual construction of an Endpoints object or EndpointSlice objects. If clusterIP is "None", no virtual IP is allocated and the endpoints are published as a set of endpoints rather than a virtual IP. "NodePort" builds on ClusterIP and allocates a port on every node which routes to the same endpoints as the clusterIP. "LoadBalancer" builds on NodePort and creates an external load-balancer (if supported in the current cloud) which routes to the same endpoints as the clusterIP. "ExternalName" aliases this service to the specified externalName. Several other fields do not apply to ExternalName services. More info: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
-               
-               Possible enum values:
-                - `"ClusterIP"` means a service will only be accessible inside the cluster, via the cluster IP.
-                - `"ExternalName"` means a service consists of only a reference to an external name that kubedns or equivalent will return as a CNAME record, with no exposing or proxying of any pods involved.
-                - `"LoadBalancer"` means a service will be exposed via an external load balancer (if the cloud provider supports it), in addition to 'NodePort' type.
-                - `"NodePort"` means a service will be exposed on one port of every node, in addition to 'ClusterIP' type.
         """
         if allocate_load_balancer_node_ports is not None:
             pulumi.set(__self__, "allocate_load_balancer_node_ports", allocate_load_balancer_node_ports)
@@ -13248,10 +12998,6 @@ class ServiceSpec(dict):
     def external_traffic_policy(self) -> Optional[str]:
         """
         externalTrafficPolicy denotes if this Service desires to route external traffic to node-local or cluster-wide endpoints. "Local" preserves the client source IP and avoids a second hop for LoadBalancer and Nodeport type services, but risks potentially imbalanced traffic spreading. "Cluster" obscures the client source IP and may cause a second hop to another node, but should have good overall load-spreading.
-
-        Possible enum values:
-         - `"Cluster"` specifies node-global (legacy) behavior.
-         - `"Local"` specifies node-local endpoints behavior.
         """
         return pulumi.get(self, "external_traffic_policy")
 
@@ -13350,10 +13096,6 @@ class ServiceSpec(dict):
     def session_affinity(self) -> Optional[str]:
         """
         Supports "ClientIP" and "None". Used to maintain session affinity. Enable client IP based session affinity. Must be ClientIP or None. Defaults to None. More info: https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies
-
-        Possible enum values:
-         - `"ClientIP"` is the Client IP based.
-         - `"None"` - no session affinity.
         """
         return pulumi.get(self, "session_affinity")
 
@@ -13378,12 +13120,6 @@ class ServiceSpec(dict):
     def type(self) -> Optional[str]:
         """
         type determines how the Service is exposed. Defaults to ClusterIP. Valid options are ExternalName, ClusterIP, NodePort, and LoadBalancer. "ClusterIP" allocates a cluster-internal IP address for load-balancing to endpoints. Endpoints are determined by the selector or if that is not specified, by manual construction of an Endpoints object or EndpointSlice objects. If clusterIP is "None", no virtual IP is allocated and the endpoints are published as a set of endpoints rather than a virtual IP. "NodePort" builds on ClusterIP and allocates a port on every node which routes to the same endpoints as the clusterIP. "LoadBalancer" builds on NodePort and creates an external load-balancer (if supported in the current cloud) which routes to the same endpoints as the clusterIP. "ExternalName" aliases this service to the specified externalName. Several other fields do not apply to ExternalName services. More info: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
-
-        Possible enum values:
-         - `"ClusterIP"` means a service will only be accessible inside the cluster, via the cluster IP.
-         - `"ExternalName"` means a service consists of only a reference to an external name that kubedns or equivalent will return as a CNAME record, with no exposing or proxying of any pods involved.
-         - `"LoadBalancer"` means a service will be exposed via an external load balancer (if the cloud provider supports it), in addition to 'NodePort' type.
-         - `"NodePort"` means a service will be exposed on one port of every node, in addition to 'ClusterIP' type.
         """
         return pulumi.get(self, "type")
 
@@ -13769,11 +13505,6 @@ class Taint(dict):
         """
         The node this Taint is attached to has the "effect" on any pod that does not tolerate the Taint.
         :param str effect: Required. The effect of the taint on pods that do not tolerate the taint. Valid effects are NoSchedule, PreferNoSchedule and NoExecute.
-               
-               Possible enum values:
-                - `"NoExecute"` Evict any already-running pods that do not tolerate the taint. Currently enforced by NodeController.
-                - `"NoSchedule"` Do not allow new pods to schedule onto the node unless they tolerate the taint, but allow all pods submitted to Kubelet without going through the scheduler to start, and allow all already-running pods to continue running. Enforced by the scheduler.
-                - `"PreferNoSchedule"` Like TaintEffectNoSchedule, but the scheduler tries not to schedule new pods onto the node, rather than prohibiting new pods from scheduling onto the node entirely. Enforced by the scheduler.
         :param str key: Required. The taint key to be applied to a node.
         :param str time_added: TimeAdded represents the time at which the taint was added. It is only written for NoExecute taints.
         :param str value: The taint value corresponding to the taint key.
@@ -13790,11 +13521,6 @@ class Taint(dict):
     def effect(self) -> str:
         """
         Required. The effect of the taint on pods that do not tolerate the taint. Valid effects are NoSchedule, PreferNoSchedule and NoExecute.
-
-        Possible enum values:
-         - `"NoExecute"` Evict any already-running pods that do not tolerate the taint. Currently enforced by NodeController.
-         - `"NoSchedule"` Do not allow new pods to schedule onto the node unless they tolerate the taint, but allow all pods submitted to Kubelet without going through the scheduler to start, and allow all already-running pods to continue running. Enforced by the scheduler.
-         - `"PreferNoSchedule"` Like TaintEffectNoSchedule, but the scheduler tries not to schedule new pods onto the node, rather than prohibiting new pods from scheduling onto the node entirely. Enforced by the scheduler.
         """
         return pulumi.get(self, "effect")
 
@@ -13854,17 +13580,8 @@ class Toleration(dict):
         """
         The pod this Toleration is attached to tolerates any taint that matches the triple <key,value,effect> using the matching operator <operator>.
         :param str effect: Effect indicates the taint effect to match. Empty means match all taint effects. When specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.
-               
-               Possible enum values:
-                - `"NoExecute"` Evict any already-running pods that do not tolerate the taint. Currently enforced by NodeController.
-                - `"NoSchedule"` Do not allow new pods to schedule onto the node unless they tolerate the taint, but allow all pods submitted to Kubelet without going through the scheduler to start, and allow all already-running pods to continue running. Enforced by the scheduler.
-                - `"PreferNoSchedule"` Like TaintEffectNoSchedule, but the scheduler tries not to schedule new pods onto the node, rather than prohibiting new pods from scheduling onto the node entirely. Enforced by the scheduler.
         :param str key: Key is the taint key that the toleration applies to. Empty means match all taint keys. If the key is empty, operator must be Exists; this combination means to match all values and all keys.
         :param str operator: Operator represents a key's relationship to the value. Valid operators are Exists and Equal. Defaults to Equal. Exists is equivalent to wildcard for value, so that a pod can tolerate all taints of a particular category.
-               
-               Possible enum values:
-                - `"Equal"`
-                - `"Exists"`
         :param int toleration_seconds: TolerationSeconds represents the period of time the toleration (which must be of effect NoExecute, otherwise this field is ignored) tolerates the taint. By default, it is not set, which means tolerate the taint forever (do not evict). Zero and negative values will be treated as 0 (evict immediately) by the system.
         :param str value: Value is the taint value the toleration matches to. If the operator is Exists, the value should be empty, otherwise just a regular string.
         """
@@ -13884,11 +13601,6 @@ class Toleration(dict):
     def effect(self) -> Optional[str]:
         """
         Effect indicates the taint effect to match. Empty means match all taint effects. When specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.
-
-        Possible enum values:
-         - `"NoExecute"` Evict any already-running pods that do not tolerate the taint. Currently enforced by NodeController.
-         - `"NoSchedule"` Do not allow new pods to schedule onto the node unless they tolerate the taint, but allow all pods submitted to Kubelet without going through the scheduler to start, and allow all already-running pods to continue running. Enforced by the scheduler.
-         - `"PreferNoSchedule"` Like TaintEffectNoSchedule, but the scheduler tries not to schedule new pods onto the node, rather than prohibiting new pods from scheduling onto the node entirely. Enforced by the scheduler.
         """
         return pulumi.get(self, "effect")
 
@@ -13905,10 +13617,6 @@ class Toleration(dict):
     def operator(self) -> Optional[str]:
         """
         Operator represents a key's relationship to the value. Valid operators are Exists and Equal. Defaults to Equal. Exists is equivalent to wildcard for value, so that a pod can tolerate all taints of a particular category.
-
-        Possible enum values:
-         - `"Equal"`
-         - `"Exists"`
         """
         return pulumi.get(self, "operator")
 
@@ -14046,10 +13754,6 @@ class TopologySpreadConstraint(dict):
                  but giving higher precedence to topologies that would help reduce the
                  skew.
                A constraint is considered "Unsatisfiable" for an incoming pod if and only if every possible node assignment for that pod would violate "MaxSkew" on some topology. For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same labelSelector spread as 3/1/1: | zone1 | zone2 | zone3 | | P P P |   P   |   P   | If WhenUnsatisfiable is set to DoNotSchedule, incoming pod can only be scheduled to zone2(zone3) to become 3/2/1(3/1/2) as ActualSkew(2-1) on zone2(zone3) satisfies MaxSkew(1). In other words, the cluster can still be imbalanced, but scheduler won't make it *more* imbalanced. It's a required field.
-               
-               Possible enum values:
-                - `"DoNotSchedule"` instructs the scheduler not to schedule the pod when constraints are not satisfied.
-                - `"ScheduleAnyway"` instructs the scheduler to schedule the pod even if constraints are not satisfied.
         :param '_meta.v1.LabelSelectorArgs' label_selector: LabelSelector is used to find matching pods. Pods that match this label selector are counted to determine the number of pods in their corresponding topology domain.
         :param int min_domains: MinDomains indicates a minimum number of eligible domains. When the number of eligible domains with matching topology keys is less than minDomains, Pod Topology Spread treats "global minimum" as 0, and then the calculation of Skew is performed. And when the number of eligible domains with matching topology keys equals or greater than minDomains, this value has no effect on scheduling. As a result, when the number of eligible domains is less than minDomains, scheduler won't schedule more than maxSkew Pods to those domains. If value is nil, the constraint behaves as if MinDomains is equal to 1. Valid values are integers greater than 0. When value is not nil, WhenUnsatisfiable must be DoNotSchedule.
                
@@ -14089,10 +13793,6 @@ class TopologySpreadConstraint(dict):
           but giving higher precedence to topologies that would help reduce the
           skew.
         A constraint is considered "Unsatisfiable" for an incoming pod if and only if every possible node assignment for that pod would violate "MaxSkew" on some topology. For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same labelSelector spread as 3/1/1: | zone1 | zone2 | zone3 | | P P P |   P   |   P   | If WhenUnsatisfiable is set to DoNotSchedule, incoming pod can only be scheduled to zone2(zone3) to become 3/2/1(3/1/2) as ActualSkew(2-1) on zone2(zone3) satisfies MaxSkew(1). In other words, the cluster can still be imbalanced, but scheduler won't make it *more* imbalanced. It's a required field.
-
-        Possible enum values:
-         - `"DoNotSchedule"` instructs the scheduler not to schedule the pod when constraints are not satisfied.
-         - `"ScheduleAnyway"` instructs the scheduler to schedule the pod even if constraints are not satisfied.
         """
         return pulumi.get(self, "when_unsatisfiable")
 
